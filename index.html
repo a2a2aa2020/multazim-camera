@@ -7,21 +7,18 @@
 
   <style>
     :root{
-      /* Gov-like design tokens (عدّلها حسب هوية الجهة) */
-      --bg: #050607;
-      --surface: rgba(20, 24, 28, .72);
-      --surface-2: rgba(255,255,255,.08);
-      --text: #F5F7FA;
+      --bg:#050607;
+      --surface: rgba(20,24,28,.72);
+      --text:#F5F7FA;
       --muted: rgba(245,247,250,.72);
 
-      --primary: #0B5FFF;   /* حكومي أزرق */
-      --accent: #19C37D;    /* أخضر الالتزام */
-      --warning: #F59E0B;
-      --danger: #EF4444;
+      --primary:#0B5FFF;
+      --accent:#19C37D;
+      --warning:#F59E0B;
+      --danger:#EF4444;
 
-      --radius-xl: 22px;
-      --radius-lg: 16px;
-      --radius-md: 12px;
+      --radius-xl:22px;
+      --radius-lg:16px;
 
       --shadow: 0 18px 60px rgba(0,0,0,.55);
       --hairline: rgba(255,255,255,.12);
@@ -30,149 +27,116 @@
       --safe-bottom: env(safe-area-inset-bottom);
     }
 
-    *{ box-sizing: border-box; margin:0; padding:0; }
+    *{box-sizing:border-box;margin:0;padding:0;}
     body{
       font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      height: 100vh;
-      overflow: hidden;
+      background:var(--bg);
+      color:var(--text);
+      height:100vh;
+      overflow:hidden;
     }
 
-    /* Camera stage */
     .stage{
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      background: #000;
+      position:relative;
+      width:100vw;
+      height:100vh;
+      background:#000;
     }
 
     #video{
       position:absolute; inset:0;
       width:100%; height:100%;
-      object-fit: cover;
-      transform: scaleX(1);
+      object-fit:cover;
     }
 
-    #captureCanvas{ display:none; }
+    #captureCanvas{display:none;}
     #overlay{
       position:absolute; inset:0;
       width:100%; height:100%;
       pointer-events:none;
     }
 
-    /* Top bar */
     .topbar{
-      position:absolute;
-      top:0; left:0; right:0;
+      position:absolute; top:0; left:0; right:0;
       padding: calc(14px + var(--safe-top)) 16px 12px;
-      display:flex;
-      align-items:center;
-      justify-content: space-between;
-      gap: 12px;
-      z-index: 10;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px;
+      z-index:10;
       background: linear-gradient(180deg, rgba(0,0,0,.75) 0%, rgba(0,0,0,0) 100%);
     }
 
-    .brand{
-      display:flex; align-items:center; gap:10px;
-      min-width: 0;
-    }
-
+    .brand{display:flex; align-items:center; gap:10px; min-width:0;}
     .logo{
-      width: 34px; height:34px;
-      border-radius: 10px;
+      width:34px;height:34px;border-radius:10px;
       background: linear-gradient(135deg, rgba(11,95,255,.95), rgba(25,195,125,.95));
       box-shadow: 0 10px 30px rgba(0,0,0,.35);
       display:flex; align-items:center; justify-content:center;
-      font-weight:800;
+      font-weight:900;
     }
+    .titleWrap{display:flex; flex-direction:column; min-width:0;}
+    .title{font-size:15px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .subtitle{font-size:12px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
-    .titleWrap{ display:flex; flex-direction:column; min-width:0; }
-    .title{
-      font-size: 15px;
-      font-weight: 800;
-      letter-spacing: .2px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .subtitle{
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 3px;
-      white-space: nowrap;
-      overflow:hidden;
-      text-overflow: ellipsis;
-    }
-
-    .topActions{ display:flex; align-items:center; gap:10px; }
+    .topActions{display:flex; align-items:center; gap:10px;}
     .iconBtn{
-      border: 1px solid var(--hairline);
+      border:1px solid var(--hairline);
       background: rgba(255,255,255,.08);
       color: var(--text);
-      padding: 10px 12px;
-      border-radius: 14px;
+      padding:10px 12px;
+      border-radius:14px;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-      cursor: pointer;
+      cursor:pointer;
       display:flex; align-items:center; gap:8px;
-      font-weight: 700;
-      font-size: 13px;
+      font-weight:800;
+      font-size:13px;
     }
-    .iconBtn:active{ transform: scale(.98); }
+    .iconBtn:active{transform:scale(.98);}
 
-    /* Hint chip */
     .hint{
       position:absolute;
       top: calc(82px + var(--safe-top));
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 10;
-      padding: 10px 14px;
-      border-radius: 999px;
-      border: 1px solid var(--hairline);
+      left:50%; transform: translateX(-50%);
+      z-index:10;
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px solid var(--hairline);
       background: rgba(20,24,28,.55);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-      color: var(--text);
-      font-size: 14px;
       box-shadow: 0 10px 35px rgba(0,0,0,.45);
-      max-width: 92vw;
+      max-width:92vw;
       text-align:center;
+      font-size:14px;
     }
 
-    /* Level pill */
     .levelPill{
       position:absolute;
       top: calc(128px + var(--safe-top));
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 10;
-      padding: 10px 14px;
-      border-radius: 999px;
-      border: 1px solid var(--hairline);
+      left:50%; transform: translateX(-50%);
+      z-index:10;
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px solid var(--hairline);
       background: rgba(20,24,28,.62);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-      font-weight: 900;
-      font-size: 13px;
+      font-weight:900;
+      font-size:13px;
       display:flex;
       gap:10px;
       align-items:center;
-      box-shadow: 0 10px 35px rgba(0,0,0,.45);
-      max-width: 92vw;
       justify-content:center;
+      box-shadow: 0 10px 35px rgba(0,0,0,.45);
+      max-width:92vw;
     }
-    .levelDot{ width:10px;height:10px;border-radius:999px;background: var(--warning); }
-    .levelVals{ color: var(--muted); font-weight:800; }
+    .levelDot{width:10px;height:10px;border-radius:999px;background: var(--warning);}
+    .levelVals{color: var(--muted); font-weight:800;}
 
-    /* Bottom sheet */
     .sheet{
-      position:absolute;
-      left:0; right:0; bottom:0;
-      padding: 10px 14px calc(14px + var(--safe-bottom));
-      z-index: 10;
+      position:absolute; left:0; right:0; bottom:0;
+      padding:10px 14px calc(14px + var(--safe-bottom));
+      z-index:10;
       background: linear-gradient(0deg, rgba(0,0,0,.92) 0%, rgba(0,0,0,0) 100%);
     }
 
@@ -187,13 +151,12 @@
     }
 
     .types{
-      display:flex;
-      gap:10px;
+      display:flex; gap:10px;
       overflow-x:auto;
       padding: 6px 4px 10px;
-      scrollbar-width: none;
+      scrollbar-width:none;
     }
-    .types::-webkit-scrollbar{ display:none; }
+    .types::-webkit-scrollbar{display:none;}
 
     .chip{
       border: 1px solid var(--hairline);
@@ -202,10 +165,10 @@
       padding: 10px 14px;
       border-radius: 999px;
       font-size: 14px;
-      font-weight: 750;
+      font-weight: 850;
       cursor:pointer;
-      white-space: nowrap;
-      transition: .18s ease;
+      white-space:nowrap;
+      transition:.18s ease;
       display:flex; align-items:center; gap:8px;
     }
     .chip.active{
@@ -213,52 +176,49 @@
       border-color: rgba(11,95,255,.65);
       box-shadow: 0 12px 30px rgba(11,95,255,.14);
     }
-    .chip:active{ transform: scale(.98); }
+    .chip:active{transform:scale(.98);}
 
     .captureRow{
-      display:flex;
-      align-items:center;
-      justify-content: space-between;
-      gap: 12px;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px;
       padding: 6px 4px 2px;
     }
 
     .miniBtn{
-      width: 46px; height:46px;
-      border-radius: 16px;
-      border: 1px solid var(--hairline);
+      width:46px;height:46px;border-radius:16px;
+      border:1px solid var(--hairline);
       background: rgba(255,255,255,.06);
       color: var(--text);
       cursor:pointer;
       display:flex; align-items:center; justify-content:center;
-      font-size: 18px;
+      font-size:18px;
     }
-    .miniBtn:active{ transform: scale(.98); }
+    .miniBtn:active{transform:scale(.98);}
 
     .capture{
-      width: 78px; height:78px;
-      border-radius: 999px;
-      border: 3px solid rgba(255,255,255,.92);
-      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.18), rgba(255,255,255,0)),
-                  linear-gradient(135deg, rgba(11,95,255,.92), rgba(25,195,125,.92));
+      width:78px;height:78px;border-radius:999px;
+      border:3px solid rgba(255,255,255,.92);
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,.18), rgba(255,255,255,0)),
+        linear-gradient(135deg, rgba(11,95,255,.92), rgba(25,195,125,.92));
       box-shadow: 0 18px 45px rgba(0,0,0,.55);
       cursor:pointer;
       display:flex; align-items:center; justify-content:center;
-      font-size: 26px;
+      font-size:26px;
       transition: opacity .2s ease;
     }
-    .capture.processing{ opacity:.65; pointer-events:none; filter: grayscale(.35); }
-    .capture:active{ transform: scale(.98); }
+    .capture.processing{opacity:.65;pointer-events:none;filter: grayscale(.35);}
+    .capture:active{transform:scale(.98);}
 
-    /* Permission screen */
     .perm{
       position:fixed; inset:0;
       display:flex; align-items:center; justify-content:center;
-      padding: 22px;
-      background: radial-gradient(1000px 800px at 70% 20%, rgba(11,95,255,.22), transparent 55%),
-                  radial-gradient(900px 700px at 20% 70%, rgba(25,195,125,.18), transparent 55%),
-                  #070A0E;
-      z-index: 100;
+      padding:22px;
+      background:
+        radial-gradient(1000px 800px at 70% 20%, rgba(11,95,255,.22), transparent 55%),
+        radial-gradient(900px 700px at 20% 70%, rgba(25,195,125,.18), transparent 55%),
+        #070A0E;
+      z-index:100;
     }
     .permCard{
       width: min(420px, 92vw);
@@ -271,143 +231,136 @@
       box-shadow: var(--shadow);
       text-align:center;
     }
-    .permCard h2{ font-size: 18px; margin-top: 12px; }
-    .permCard p{ color: var(--muted); margin-top: 10px; line-height:1.7; font-size: 14px; }
+    .permCard h2{font-size:18px;margin-top:12px;}
+    .permCard p{color: var(--muted); margin-top:10px; line-height:1.7; font-size:14px;}
+
     .primaryBtn{
-      margin-top: 16px;
-      width: 100%;
-      border: none;
+      margin-top:16px;
+      width:100%;
+      border:none;
       background: var(--primary);
-      color: #fff;
-      font-weight: 800;
-      padding: 14px 16px;
-      border-radius: 16px;
+      color:#fff;
+      font-weight:900;
+      padding:14px 16px;
+      border-radius:16px;
       cursor:pointer;
       box-shadow: 0 18px 35px rgba(11,95,255,.25);
-      font-size: 15px;
+      font-size:15px;
     }
-    .primaryBtn:active{ transform: scale(.99); }
+    .primaryBtn:active{transform:scale(.99);}
 
-    /* Modal */
     .modal{
       position:fixed; inset:0;
       background: rgba(0,0,0,.92);
-      z-index: 200;
+      z-index:200;
       display:none;
       padding: calc(14px + var(--safe-top)) 14px calc(14px + var(--safe-bottom));
     }
-    .modal.active{ display:flex; flex-direction:column; gap:12px; }
+    .modal.active{display:flex;flex-direction:column;gap:12px;}
 
     .modalHeader{
-      display:flex; align-items:center; justify-content:space-between;
-      padding: 12px 14px;
-      border-radius: 18px;
-      border: 1px solid var(--hairline);
+      display:flex;align-items:center;justify-content:space-between;
+      padding:12px 14px;
+      border-radius:18px;
+      border:1px solid var(--hairline);
       background: rgba(20,24,28,.56);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
     }
-    .modalHeader strong{ font-size: 15px; }
+    .modalHeader strong{font-size:15px;}
     .closeBtn{
-      border: 1px solid var(--hairline);
+      border:1px solid var(--hairline);
       background: rgba(255,255,255,.06);
       color: var(--text);
-      padding: 8px 10px;
-      border-radius: 14px;
+      padding:8px 10px;
+      border-radius:14px;
       cursor:pointer;
     }
 
     .modalBody{
       flex:1;
       overflow:auto;
-      border-radius: 22px;
-      border: 1px solid var(--hairline);
+      border-radius:22px;
+      border:1px solid var(--hairline);
       background: rgba(20,24,28,.56);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      padding: 14px;
+      padding:14px;
     }
 
     .preview{
       width:100%;
-      border-radius: 18px;
-      border: 1px solid var(--hairline);
-      margin-bottom: 14px;
+      border-radius:18px;
+      border:1px solid var(--hairline);
+      margin-bottom:14px;
       display:block;
     }
 
     .card{
-      border-radius: 18px;
-      border: 1px solid var(--hairline);
+      border-radius:18px;
+      border:1px solid var(--hairline);
       background: rgba(255,255,255,.06);
-      padding: 14px;
+      padding:14px;
     }
 
-    .statusRow{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .statusRow{display:flex;align-items:center;justify-content:space-between;gap:10px;}
     .badge{
-      padding: 8px 12px;
-      border-radius: 999px;
-      font-weight: 900;
-      font-size: 13px;
-      border: 1px solid var(--hairline);
-      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      font-weight:900;
+      font-size:13px;
+      border:1px solid var(--hairline);
+      display:inline-flex;align-items:center;gap:8px;
     }
-    .badge.ok{ background: rgba(25,195,125,.14); border-color: rgba(25,195,125,.45); }
-    .badge.no{ background: rgba(239,68,68,.14); border-color: rgba(239,68,68,.45); }
-    .badge.maybe{ background: rgba(245,158,11,.14); border-color: rgba(245,158,11,.45); }
+    .badge.ok{background: rgba(25,195,125,.14); border-color: rgba(25,195,125,.45);}
+    .badge.no{background: rgba(239,68,68,.14); border-color: rgba(239,68,68,.45);}
+    .badge.maybe{background: rgba(245,158,11,.14); border-color: rgba(245,158,11,.45);}
 
-    .meta{ color: var(--muted); font-size: 13px; margin-top: 10px; }
+    .meta{color:var(--muted);font-size:13px;margin-top:10px;}
     .bar{
-      height: 10px; border-radius: 999px; background: rgba(255,255,255,.10);
-      margin-top: 10px; overflow:hidden;
-      border: 1px solid var(--hairline);
+      height:10px;border-radius:999px;background: rgba(255,255,255,.10);
+      margin-top:10px;overflow:hidden;border:1px solid var(--hairline);
     }
-    .fill{ height:100%; width:0%; transition: width 600ms ease; }
+    .fill{height:100%;width:0%;transition:width 600ms ease;}
 
-    .msg{
-      margin-top: 12px;
-      color: rgba(245,247,250,.9);
-      line-height: 1.7;
-      font-size: 14px;
-    }
+    .msg{margin-top:12px;color: rgba(245,247,250,.9);line-height:1.7;font-size:14px;}
 
     .actions{
       display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 12px;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:12px;
     }
     .ghost{
-      border: 1px solid rgba(255,255,255,.18);
+      border:1px solid rgba(255,255,255,.18);
       background: rgba(255,255,255,.06);
       color: var(--text);
-      padding: 12px 14px;
-      border-radius: 16px;
-      font-weight: 800;
+      padding:12px 14px;
+      border-radius:16px;
+      font-weight:900;
       cursor:pointer;
     }
 
-    /* Toast */
     .toast{
-      position: fixed;
-      left: 50%;
+      position:fixed;
+      left:50%;
       transform: translateX(-50%);
       bottom: calc(110px + var(--safe-bottom));
-      z-index: 300;
-      padding: 10px 14px;
-      border-radius: 999px;
-      border: 1px solid var(--hairline);
+      z-index:300;
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px solid var(--hairline);
       background: rgba(20,24,28,.72);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       color: var(--text);
-      font-size: 13px;
+      font-size:13px;
       display:none;
-      max-width: 92vw;
+      max-width:92vw;
       text-align:center;
       box-shadow: 0 16px 50px rgba(0,0,0,.55);
     }
-    .toast.show{ display:block; }
+    .toast.show{display:block;}
   </style>
 
   <!-- EmailJS (للتجربة الآن) -->
@@ -422,11 +375,11 @@
       <div style="font-size:64px">📷</div>
       <h2 id="permTitle">الوصول للكاميرا والحساسات مطلوب</h2>
       <p id="permDesc">
-        تستخدم هذه الخدمة الكاميرا لإجراء فحص ميداني، وتستخدم حساسات الجهاز (Pitch/Roll) لتثبيت وضعية الهاتف وتحسين دقة الفحص.
+        يستخدم التطبيق الكاميرا للفحص، ويستخدم حساسات الحركة (الجاذبية) لضبط استواء الهاتف قبل الالتقاط.
       </p>
       <button class="primaryBtn" id="permBtn">السماح والبدء</button>
       <p style="margin-top:12px; font-size:12px; color: var(--muted);">
-        سيتم تشغيل الكاميرا فقط أثناء استخدام الشاشة.
+        ستُطلب أذونات الحساسات على iPhone عند الحاجة.
       </p>
     </div>
   </div>
@@ -445,11 +398,8 @@
           <div class="subtitle" id="appSub">خدمة فحص ميداني — نسخة تجريبية</div>
         </div>
       </div>
-
       <div class="topActions">
-        <button class="iconBtn" id="langBtn" title="تبديل اللغة">
-          🌐 <span id="langLabel">EN</span>
-        </button>
+        <button class="iconBtn" id="langBtn" title="تبديل اللغة">🌐 <span id="langLabel">EN</span></button>
       </div>
     </div>
 
@@ -515,31 +465,258 @@
   // ===========================
   //  EmailJS إعدادات (عدّلها)
   // ===========================
-  const EMAILJS_PUBLIC_KEY = "PUT_YOUR_PUBLIC_KEY_HERE";
-  const EMAILJS_SERVICE_ID = "PUT_YOUR_SERVICE_ID_HERE";
+  const EMAILJS_PUBLIC_KEY  = "PUT_YOUR_PUBLIC_KEY_HERE";
+  const EMAILJS_SERVICE_ID  = "PUT_YOUR_SERVICE_ID_HERE";
   const EMAILJS_TEMPLATE_ID = "PUT_YOUR_TEMPLATE_ID_HERE";
-
-  // بريد الاستلام ثابت حسب طلبك
   const EMAIL_TO = "a.alamm@datainsight.com.sa";
 
   // تهيئة EmailJS
-  // ملاحظة: ضع مفاتيحك الحقيقية قبل التجربة
   emailjs.init(EMAILJS_PUBLIC_KEY);
 
-  // ===== State =====
+  // ===========================
+  //  State
+  // ===========================
   let stream = null;
   let currentLang = 'ar';
   let selectedType = '4.5';
-  let facingMode = 'environment'; // or 'user'
+  let facingMode = 'environment';
   let lastBlob = null;
 
-  // ===== Level / Sensors =====
-  let lastPitch = null;
-  let lastRoll = null;
-  let isLevel = false;
-  const LEVEL_TOL_DEG = 2; // ±2°
+  // ===========================
+  //  Level / Sensors (آخر اقتراح: DeviceMotion + Gravity + Compensation + Smoothing + Stability)
+  // ===========================
+  // السماح بالالتقاط عند ميل صغير + ثبات لزمن قصير
+  const LEVEL_TOL_DEG = 2;         // ±2° (شرط الاستواء)
+  const STABILITY_TOL_DEG = 0.35;  // مقدار التذبذب المسموح خلال نافذة الاستقرار (±0.35° تقريباً)
+  const STABILITY_MS = 450;        // لازم يبقى مستوياً وثابتاً 450ms
+  const SMOOTH_ALPHA = 0.18;       // معامل التنعيم (0..1) أصغر = أنعم/أبطأ
 
-  // ===== Translations =====
+  let isLevel = false;
+  let isStable = false;
+
+  // القيم الخام/المفلترة
+  let lastPitchRaw = null, lastRollRaw = null;
+  let pitchFiltered = null, rollFiltered = null;
+
+  // نافذة للثبات
+  let stableSince = null;
+  let windowSamples = []; // {t, p, r}
+  const MAX_WINDOW_MS = 650;
+
+  // طلب إذن الحساسات على iOS (DeviceMotion)
+  async function requestMotionPermissionIfNeeded(){
+    try{
+      if(typeof DeviceMotionEvent !== 'undefined' &&
+         typeof DeviceMotionEvent.requestPermission === 'function'){
+        const res = await DeviceMotionEvent.requestPermission();
+        return res === 'granted';
+      }
+      return true;
+    }catch(e){
+      console.error(e);
+      return false;
+    }
+  }
+
+  // قراءة زاوية الشاشة (للتعويض عن تدوير الجهاز)
+  function getScreenAngle(){
+    // 0 / 90 / 180 / 270
+    const so = (screen.orientation && typeof screen.orientation.angle === 'number')
+      ? screen.orientation.angle
+      : (typeof window.orientation === 'number' ? window.orientation : 0);
+    // normalize to 0..359
+    return ((so % 360) + 360) % 360;
+  }
+
+  // تعويض المحاور حسب زاوية الشاشة
+  function compensateForScreenAngle(pitch, roll){
+    // pitch/roll هنا محسوبة بالنسبة لمحاور الجهاز في وضع portrait الافتراضي.
+    // عند تدوير الشاشة، نحول (pitch, roll) للعرض الصحيح.
+    const ang = getScreenAngle();
+    let p = pitch, r = roll;
+
+    // ملاحظة: التعويضات ليست “فيزياء كاملة” لكنها عملية جداً للحالة الواقعية
+    // 0: portrait
+    // 90: landscape-right
+    // 180: portrait-upside-down
+    // 270: landscape-left
+    if(ang === 90){
+      // تبادل مع إشارات
+      const tmp = p;
+      p = -r;
+      r = tmp;
+    } else if(ang === 180){
+      p = -p;
+      r = -r;
+    } else if(ang === 270){
+      const tmp = p;
+      p = r;
+      r = -tmp;
+    }
+    return { pitch:p, roll:r, angle: ang };
+  }
+
+  // حساب pitch/roll من متجه الجاذبية
+  function computePitchRollFromGravity(ax, ay, az){
+    // ax, ay, az من accelerationIncludingGravity (m/s^2 تقريباً)
+    // pitch: ميل للأمام/الخلف
+    // roll: ميل لليمين/اليسار
+    // صيغ شائعة لميزان الماء (تعمل جيداً لمعظم الأجهزة)
+    const roll  = Math.atan2(ay, az) * 180 / Math.PI;
+    const pitch = Math.atan2(-ax, Math.sqrt(ay*ay + az*az)) * 180 / Math.PI;
+    return { pitch, roll };
+  }
+
+  // تنعيم Exponential Moving Average
+  function smooth(value, prev){
+    if(prev === null || prev === undefined) return value;
+    return prev + SMOOTH_ALPHA * (value - prev);
+  }
+
+  function updateStability(now, p, r){
+    // أضف عينة
+    windowSamples.push({ t: now, p, r });
+
+    // احذف القديم
+    const cutoff = now - MAX_WINDOW_MS;
+    while(windowSamples.length && windowSamples[0].t < cutoff){
+      windowSamples.shift();
+    }
+
+    // احسب التذبذب في النافذة (peak-to-peak)
+    let pMin = Infinity, pMax = -Infinity, rMin = Infinity, rMax = -Infinity;
+    for(const s of windowSamples){
+      if(s.p < pMin) pMin = s.p;
+      if(s.p > pMax) pMax = s.p;
+      if(s.r < rMin) rMin = s.r;
+      if(s.r > rMax) rMax = s.r;
+    }
+    const pRange = (pMax - pMin);
+    const rRange = (rMax - rMin);
+
+    // هل مستقر؟
+    const stableWindow = (pRange <= STABILITY_TOL_DEG) && (rRange <= STABILITY_TOL_DEG);
+    return { stableWindow, pRange, rRange };
+  }
+
+  function setLevelState(pitchDeg, rollDeg, meta){
+    // شروط الاستواء
+    isLevel = (Math.abs(pitchDeg) <= LEVEL_TOL_DEG) && (Math.abs(rollDeg) <= LEVEL_TOL_DEG);
+
+    // شروط الثبات (مع نافذة زمنية)
+    const now = performance.now();
+    const { stableWindow, pRange, rRange } = updateStability(now, pitchDeg, rollDeg);
+
+    // نعتبر “مستقر” إذا مستوي + نافذة مستقرة لمدة STABILITY_MS
+    if(isLevel && stableWindow){
+      if(stableSince === null) stableSince = now;
+      isStable = (now - stableSince) >= STABILITY_MS;
+    } else {
+      stableSince = null;
+      isStable = false;
+    }
+
+    // تحديث الواجهة
+    updateLevelUI(pitchDeg, rollDeg, {
+      ...meta,
+      pRange, rRange,
+      stableWindow
+    });
+  }
+
+  function updateLevelUI(pitchDeg, rollDeg, meta){
+    const dot = document.getElementById('levelDot');
+    const text = document.getElementById('levelText');
+    const vals = document.getElementById('levelVals');
+    const L = TT[currentLang];
+
+    const p = Math.round(pitchDeg * 10) / 10;
+    const r = Math.round(rollDeg * 10) / 10;
+
+    // معلومات مفيدة: زاوية الشاشة + مدى التذبذب
+    const ang = meta && typeof meta.angle === 'number' ? meta.angle : getScreenAngle();
+    const pr = meta && typeof meta.pRange === 'number' ? meta.pRange : 0;
+    const rr = meta && typeof meta.rRange === 'number' ? meta.rRange : 0;
+
+    vals.textContent = `P:${p}°  R:${r}°  ↻${ang}°`;
+
+    // الحالة: نريد "مستوٍ + ثابت"
+    if(isStable){
+      dot.style.background = 'var(--accent)';
+      text.textContent = L.levelOkStable;
+      enableCapture();
+    } else if(isLevel){
+      dot.style.background = 'var(--warning)';
+      text.textContent = (currentLang==='ar')
+        ? `جيد… ثبّت لحظة (${Math.round(STABILITY_MS/100)/10}s) | اهتزاز P:${(pr).toFixed(2)} R:${(rr).toFixed(2)}`
+        : `Almost… hold steady (${Math.round(STABILITY_MS/100)/10}s) | jitter P:${(pr).toFixed(2)} R:${(rr).toFixed(2)}`;
+      disableCapture();
+    } else {
+      dot.style.background = 'var(--danger)';
+      text.textContent = L.levelHold(LEVEL_TOL_DEG);
+      disableCapture();
+    }
+  }
+
+  // معالج DeviceMotion
+  function handleDeviceMotion(e){
+    const ag = e.accelerationIncludingGravity;
+    if(!ag) return;
+
+    // بعض الأجهزة تعطي null أحياناً
+    const ax = (typeof ag.x === 'number') ? ag.x : 0;
+    const ay = (typeof ag.y === 'number') ? ag.y : 0;
+    const az = (typeof ag.z === 'number') ? ag.z : 0;
+
+    const { pitch, roll } = computePitchRollFromGravity(ax, ay, az);
+
+    // حفظ الخام
+    lastPitchRaw = pitch;
+    lastRollRaw = roll;
+
+    // تعويض الدوران
+    const comp = compensateForScreenAngle(pitch, roll);
+
+    // تنعيم
+    pitchFiltered = smooth(comp.pitch, pitchFiltered);
+    rollFiltered  = smooth(comp.roll,  rollFiltered);
+
+    // تحديث الحالة
+    setLevelState(pitchFiltered, rollFiltered, { angle: comp.angle });
+  }
+
+  let motionListening = false;
+
+  async function enableMotionSensors(){
+    const ok = await requestMotionPermissionIfNeeded();
+    if(!ok){
+      toast(currentLang==='ar' ? 'تم رفض إذن الحساسات.' : 'Motion permission denied.');
+      disableCapture();
+      return false;
+    }
+    if(!motionListening){
+      window.addEventListener('devicemotion', handleDeviceMotion, { passive:true });
+      motionListening = true;
+    }
+    return true;
+  }
+
+  function removeMotionSensors(){
+    if(motionListening){
+      window.removeEventListener('devicemotion', handleDeviceMotion);
+      motionListening = false;
+    }
+    isLevel = false;
+    isStable = false;
+    stableSince = null;
+    windowSamples = [];
+    lastPitchRaw = lastRollRaw = null;
+    pitchFiltered = rollFiltered = null;
+  }
+
+  // ===========================
+  //  Translations
+  // ===========================
   const TT = {
     ar: {
       appTitle: 'ملتزم — كاميرا الفحص',
@@ -551,10 +728,13 @@
       close: 'إغلاق ✕',
       lang: 'EN',
       rule: (x)=> x==='defects' ? 'فحص العيوب' : `القاعدة ${x}`,
-      levelHold: (tol)=> `ثبّت الهاتف ليصبح مستويًا (±${tol}°)`,
-      levelOk: '✅ الجهاز مستوٍ — يمكنك الالتقاط',
+      levelHold: (tol)=> `عدّل وضع الهاتف حتى يصبح قريبًا من الاستواء (±${tol}°)`,
+      levelOkStable: '✅ مستوٍ وثابت — يمكنك الالتقاط',
       emailSent: 'تم إرسال نتيجة الفحص بالبريد ✅',
       emailFail: 'تعذر إرسال البريد. تأكد من إعداد EmailJS.',
+      cameraFail: 'فشل تشغيل الكاميرا. تأكد من منح الإذن.',
+      captureFail: 'فشل التقاط الصورة.',
+      needStable: 'ثبّت الهاتف حتى يصبح مستويًا وثابتًا قبل الالتقاط.'
     },
     en: {
       appTitle: 'Multazim — Inspection Camera',
@@ -566,14 +746,19 @@
       close: 'Close ✕',
       lang: 'AR',
       rule: (x)=> x==='defects' ? 'Defects Scan' : `Rule ${x}`,
-      levelHold: (tol)=> `Hold device level (±${tol}°)`,
-      levelOk: '✅ Level — You can capture',
+      levelHold: (tol)=> `Adjust device to be near level (±${tol}°)`,
+      levelOkStable: '✅ Level & steady — you can capture',
       emailSent: 'Result emailed ✅',
       emailFail: 'Email failed. Check EmailJS setup.',
+      cameraFail: 'Unable to start camera. Please grant permission.',
+      captureFail: 'Capture failed.',
+      needStable: 'Hold device level and steady before capturing.'
     }
   };
 
-  // ===== Helpers =====
+  // ===========================
+  //  Helpers
+  // ===========================
   function toast(msg){
     const el = document.getElementById('toast');
     el.textContent = msg;
@@ -598,9 +783,10 @@
 
     document.getElementById('ruleLabel').textContent = L.rule(selectedType);
 
-    // تحديث نص مؤشر المستوى حسب الحالة الحالية
+    // تحديث نص المستوى حسب الحالة الحالية
     const levelText = document.getElementById('levelText');
-    levelText.textContent = isLevel ? L.levelOk : L.levelHold(LEVEL_TOL_DEG);
+    if(isStable) levelText.textContent = L.levelOkStable;
+    else levelText.textContent = L.levelHold(LEVEL_TOL_DEG);
   }
 
   function disableCapture(){
@@ -608,77 +794,17 @@
     captureBtn.style.opacity = '.55';
     captureBtn.style.pointerEvents = 'none';
   }
-
   function enableCapture(){
     const captureBtn = document.getElementById('captureBtn');
     captureBtn.style.opacity = '1';
     captureBtn.style.pointerEvents = 'auto';
   }
 
-  // ===== Sensors =====
-  function updateLevelUI(pitch, roll){
-    const dot = document.getElementById('levelDot');
-    const text = document.getElementById('levelText');
-    const vals = document.getElementById('levelVals');
-    const L = TT[currentLang];
-
-    const p = Math.round(pitch * 10) / 10;
-    const r = Math.round(roll * 10) / 10;
-
-    vals.textContent = `P:${p}°  R:${r}°`;
-
-    isLevel = (Math.abs(pitch) <= LEVEL_TOL_DEG) && (Math.abs(roll) <= LEVEL_TOL_DEG);
-
-    if(isLevel){
-      dot.style.background = 'var(--accent)';
-      text.textContent = L.levelOk;
-      enableCapture();
-    } else {
-      dot.style.background = 'var(--warning)';
-      text.textContent = L.levelHold(LEVEL_TOL_DEG);
-      disableCapture();
-    }
-  }
-
-  function handleOrientation(e){
-    const pitch = (typeof e.beta === 'number') ? e.beta : 0;   // front-back
-    const roll  = (typeof e.gamma === 'number') ? e.gamma : 0; // left-right
-    lastPitch = pitch;
-    lastRoll = roll;
-    updateLevelUI(pitch, roll);
-  }
-
-  async function enableSensors(){
-    try{
-      if(typeof DeviceOrientationEvent !== 'undefined' &&
-         typeof DeviceOrientationEvent.requestPermission === 'function'){
-        const res = await DeviceOrientationEvent.requestPermission();
-        if(res !== 'granted'){
-          toast(currentLang==='ar' ? 'تم رفض إذن الحساسات.' : 'Sensor permission denied.');
-          disableCapture(); // بدون حساسات نخلي الالتقاط مقفول
-          return false;
-        }
-      }
-      window.addEventListener('deviceorientation', handleOrientation, true);
-      return true;
-    }catch(err){
-      console.error(err);
-      toast(currentLang==='ar' ? 'تعذّر تفعيل الحساسات.' : 'Failed to enable sensors.');
-      disableCapture();
-      return false;
-    }
-  }
-
-  function removeSensors(){
-    window.removeEventListener('deviceorientation', handleOrientation, true);
-    lastPitch = null;
-    lastRoll = null;
-    isLevel = false;
-  }
-
-  // ===== Camera =====
+  // ===========================
+  //  Camera
+  // ===========================
   async function startCamera(){
-    stopCamera(); // ensure no double streams
+    stopCamera();
     try{
       stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode, width: { ideal: 1280 }, height: { ideal: 720 } },
@@ -693,19 +819,15 @@
 
       await video.play();
 
-      // Overlay loop
       resizeOverlay();
       drawLoop();
 
-      // Sensors (بعد ضغط المستخدم زر السماح — مناسب لـ iOS)
-      disableCapture();          // نقفل الالتقاط مبدئياً
-      await enableSensors();     // سيفتح الالتقاط فقط عند الاستواء
+      // Motion sensors
+      disableCapture();              // قفل افتراضي
+      await enableMotionSensors();   // يفتح فقط عند "مستوٍ وثابت"
 
     }catch(e){
-      toast(currentLang==='ar'
-        ? 'فشل تشغيل الكاميرا. تأكد من منح الإذن.'
-        : 'Unable to start camera. Please grant permission.'
-      );
+      toast(TT[currentLang].cameraFail);
       console.error(e);
     }
   }
@@ -717,7 +839,9 @@
     }
   }
 
-  // ===== Overlay drawing =====
+  // ===========================
+  //  Overlay drawing
+  // ===========================
   function resizeOverlay(){
     const overlay = document.getElementById('overlay');
     const rect = overlay.getBoundingClientRect();
@@ -803,11 +927,13 @@
     setTexts();
   }
 
-  // ===== Capture & Analyze (محاكاة) =====
+  // ===========================
+  //  Capture & Analyze (محاكاة)
+  // ===========================
   async function capture(){
-    // قفل نهائي: حتى لو UI مفتوح بالخطأ
-    if(!isLevel){
-      toast(currentLang==='ar' ? 'ثبّت الهاتف أولاً حتى يصبح مستويًا.' : 'Hold device level first.');
+    // قفل نهائي
+    if(!isStable){
+      toast(TT[currentLang].needStable);
       return;
     }
 
@@ -828,11 +954,12 @@
       document.getElementById('preview').src = url;
 
       openModalLoading();
+
       setTimeout(async ()=>{
         const result = mockResult();
         showResult(result);
 
-        // إرسال بريد بالنتيجة بعد كل فحص
+        // إرسال بريد بالنتيجة
         try{
           await sendResultEmail(result);
           toast(TT[currentLang].emailSent);
@@ -843,7 +970,7 @@
       }, 900);
 
     }catch(e){
-      toast(currentLang==='ar' ? 'فشل التقاط الصورة.' : 'Capture failed.');
+      toast(TT[currentLang].captureFail);
       console.error(e);
     }finally{
       btn.classList.remove('processing');
@@ -858,9 +985,7 @@
     document.getElementById('confText').textContent = currentLang==='ar' ? 'مستوى الثقة: —' : 'Confidence: —';
     document.getElementById('fill').style.width = '0%';
     document.getElementById('fill').style.background = 'linear-gradient(90deg, rgba(245,158,11,.9), rgba(11,95,255,.9))';
-    document.getElementById('msg').textContent = currentLang==='ar'
-      ? 'يتم الآن معالجة الصورة…'
-      : 'Processing the image…';
+    document.getElementById('msg').textContent = currentLang==='ar' ? 'يتم الآن معالجة الصورة…' : 'Processing the image…';
     document.getElementById('ruleLabel').textContent = L.rule(selectedType);
   }
 
@@ -916,9 +1041,11 @@
     msg.textContent = (currentLang==='ar') ? r.msgAr : r.msgEn;
   }
 
-  // ===== EmailJS: إرسال نتيجة الفحص =====
+  // ===========================
+  //  EmailJS: إرسال نتيجة الفحص
+  // ===========================
   async function sendResultEmail(result){
-    // حماية: إذا لم تُعدّل مفاتيح EmailJS، لا نحاول الإرسال
+    // لا تحاول الإرسال بدون مفاتيح
     if(!EMAILJS_PUBLIC_KEY || EMAILJS_PUBLIC_KEY.includes("PUT_") ||
        !EMAILJS_SERVICE_ID || EMAILJS_SERVICE_ID.includes("PUT_") ||
        !EMAILJS_TEMPLATE_ID || EMAILJS_TEMPLATE_ID.includes("PUT_")){
@@ -927,6 +1054,11 @@
 
     const L = TT[currentLang];
     const ts = new Date();
+
+    // استخدم القيم المفلترة لأنها “أقرب للحقيقة”
+    const p = (typeof pitchFiltered === 'number') ? pitchFiltered : lastPitchRaw;
+    const r = (typeof rollFiltered === 'number') ? rollFiltered : lastRollRaw;
+
     const payload = {
       to_email: EMAIL_TO,
       rule: L.rule(selectedType),
@@ -934,26 +1066,25 @@
       status: result.status,
       confidence: result.confidence + '%',
       message: (currentLang==='ar') ? result.msgAr : result.msgEn,
-      pitch: (typeof lastPitch === 'number') ? lastPitch.toFixed(2) + '°' : 'N/A',
-      roll: (typeof lastRoll === 'number') ? lastRoll.toFixed(2) + '°' : 'N/A',
+      pitch: (typeof p === 'number') ? p.toFixed(2) + '°' : 'N/A',
+      roll:  (typeof r === 'number') ? r.toFixed(2) + '°' : 'N/A',
+      screen_angle: String(getScreenAngle()),
+      stable: isStable ? 'YES' : 'NO',
       timestamp: ts.toLocaleString(),
       lang: currentLang.toUpperCase()
     };
 
-    // إرسال عبر EmailJS Template Variables
     return emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, payload);
   }
 
-  // ===== Events =====
+  // ===========================
+  //  Events
+  // ===========================
   document.getElementById('permBtn').addEventListener('click', startCamera);
 
   document.getElementById('langBtn').addEventListener('click', ()=>{
     currentLang = (currentLang==='ar') ? 'en' : 'ar';
     setTexts();
-    // إعادة تحديث مؤشر المستوى فوراً عند تغيير اللغة
-    if(typeof lastPitch === 'number' && typeof lastRoll === 'number'){
-      updateLevelUI(lastPitch, lastRoll);
-    }
   });
 
   document.getElementById('types').addEventListener('click', (e)=>{
@@ -985,7 +1116,7 @@
   document.getElementById('stopBtn').addEventListener('click', ()=>{
     stopOverlayLoop();
     stopCamera();
-    removeSensors();
+    removeMotionSensors();
     document.getElementById('stage').style.display = 'none';
     document.getElementById('perm').style.display = 'flex';
     disableCapture();
@@ -998,13 +1129,15 @@
       ? (facingMode==='environment' ? 'الكاميرا الخلفية' : 'الكاميرا الأمامية')
       : (facingMode==='environment' ? 'Rear camera' : 'Front camera')
     );
-    removeSensors();
+    removeMotionSensors();
     await startCamera();
   });
 
   window.addEventListener('resize', resizeOverlay);
 
-  // init
+  // ===========================
+  //  Init
+  // ===========================
   disableCapture();
   setTexts();
 </script>
