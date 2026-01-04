@@ -1,170 +1,829 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<title>ملتزم — فحص ميداني بالواقع المعزز</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>ملتزم — كاميرا الفحص</title>
 
-<style>
-body { margin:0; background:#000; color:#fff; font-family:system-ui; }
-#hud {
-  position:fixed; top:16px; left:50%; transform:translateX(-50%);
-  background:rgba(0,0,0,.65);
-  padding:12px 18px;
-  border-radius:14px;
-  z-index:10;
-  text-align:center;
-  max-width:92vw;
-}
-#controls {
-  position:fixed; bottom:18px; left:50%; transform:translateX(-50%);
-  display:flex; gap:10px; z-index:10;
-  flex-wrap:wrap;
-  justify-content:center;
-  width:92vw;
-}
-button {
-  padding:14px 16px;
-  font-size:14px;
-  border-radius:14px;
-  border:none;
-  background:#0B5FFF;
-  color:#fff;
-  font-weight:700;
-  flex:1 1 auto;
-}
-button.secondary { background:#444; }
-</style>
+  <style>
+    :root{
+      /* Gov-like design tokens (عدّلها حسب هوية الجهة) */
+      --bg: #050607;
+      --surface: rgba(20, 24, 28, .72);
+      --surface-2: rgba(255,255,255,.08);
+      --text: #F5F7FA;
+      --muted: rgba(245,247,250,.72);
+
+      --primary: #0B5FFF;   /* حكومي أزرق */
+      --accent: #19C37D;    /* أخضر التزام/نجاح */
+      --warning: #F59E0B;
+      --danger: #EF4444;
+
+      --radius-xl: 22px;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+
+      --shadow: 0 18px 60px rgba(0,0,0,.55);
+      --hairline: rgba(255,255,255,.12);
+
+      --safe-top: env(safe-area-inset-top);
+      --safe-bottom: env(safe-area-inset-bottom);
+    }
+
+    *{ box-sizing: border-box; margin:0; padding:0; }
+    body{
+      font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Camera stage */
+    .stage{
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      background: #000;
+    }
+
+    #video{
+      position:absolute; inset:0;
+      width:100%; height:100%;
+      object-fit: cover;
+      transform: scaleX(1); /* لو احتجت mirror للكاميرا الأمامية غيّرها */
+    }
+
+    #captureCanvas{ display:none; }
+    #overlay{
+      position:absolute; inset:0;
+      width:100%; height:100%;
+      pointer-events:none;
+    }
+
+    /* Top bar */
+    .topbar{
+      position:absolute;
+      top:0; left:0; right:0;
+      padding: calc(14px + var(--safe-top)) 16px 12px;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 12px;
+      z-index: 10;
+      background: linear-gradient(180deg, rgba(0,0,0,.75) 0%, rgba(0,0,0,0) 100%);
+    }
+
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      min-width: 0;
+    }
+
+    .logo{
+      width: 34px; height:34px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(11,95,255,.95), rgba(25,195,125,.95));
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+      display:flex; align-items:center; justify-content:center;
+      font-weight:800;
+    }
+
+    .titleWrap{ display:flex; flex-direction:column; min-width:0; }
+    .title{
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: .2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .subtitle{
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 3px;
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+    }
+
+    .topActions{ display:flex; align-items:center; gap:10px; }
+    .iconBtn{
+      border: 1px solid var(--hairline);
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 14px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      cursor: pointer;
+      display:flex; align-items:center; gap:8px;
+      font-weight: 700;
+      font-size: 13px;
+    }
+    .iconBtn:active{ transform: scale(.98); }
+
+    /* Hint chip */
+    .hint{
+      position:absolute;
+      top: calc(82px + var(--safe-top));
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--hairline);
+      background: rgba(20,24,28,.55);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: var(--text);
+      font-size: 14px;
+      box-shadow: 0 10px 35px rgba(0,0,0,.45);
+      max-width: 92vw;
+      text-align:center;
+    }
+
+    /* Bottom sheet */
+    .sheet{
+      position:absolute;
+      left:0; right:0; bottom:0;
+      padding: 10px 14px calc(14px + var(--safe-bottom));
+      z-index: 10;
+      background: linear-gradient(0deg, rgba(0,0,0,.92) 0%, rgba(0,0,0,0) 100%);
+    }
+
+    .sheetCard{
+      border: 1px solid var(--hairline);
+      background: rgba(20,24,28,.56);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: var(--radius-xl);
+      padding: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    .types{
+      display:flex;
+      gap:10px;
+      overflow-x:auto;
+      padding: 6px 4px 10px;
+      scrollbar-width: none;
+    }
+    .types::-webkit-scrollbar{ display:none; }
+
+    .chip{
+      border: 1px solid var(--hairline);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 750;
+      cursor:pointer;
+      white-space: nowrap;
+      transition: .18s ease;
+      display:flex; align-items:center; gap:8px;
+    }
+    .chip.active{
+      background: rgba(11,95,255,.22);
+      border-color: rgba(11,95,255,.65);
+      box-shadow: 0 12px 30px rgba(11,95,255,.14);
+    }
+    .chip:active{ transform: scale(.98); }
+
+    .captureRow{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 6px 4px 2px;
+    }
+
+    .miniBtn{
+      width: 46px; height:46px;
+      border-radius: 16px;
+      border: 1px solid var(--hairline);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      font-size: 18px;
+    }
+    .miniBtn:active{ transform: scale(.98); }
+
+    .capture{
+      width: 78px; height:78px;
+      border-radius: 999px;
+      border: 3px solid rgba(255,255,255,.92);
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.18), rgba(255,255,255,0)),
+                  linear-gradient(135deg, rgba(11,95,255,.92), rgba(25,195,125,.92));
+      box-shadow: 0 18px 45px rgba(0,0,0,.55);
+      cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      font-size: 26px;
+    }
+    .capture.processing{ opacity:.65; pointer-events:none; filter: grayscale(.35); }
+    .capture:active{ transform: scale(.98); }
+
+    /* Permission screen */
+    .perm{
+      position:fixed; inset:0;
+      display:flex; align-items:center; justify-content:center;
+      padding: 22px;
+      background: radial-gradient(1000px 800px at 70% 20%, rgba(11,95,255,.22), transparent 55%),
+                  radial-gradient(900px 700px at 20% 70%, rgba(25,195,125,.18), transparent 55%),
+                  #070A0E;
+      z-index: 100;
+    }
+    .permCard{
+      width: min(420px, 92vw);
+      border-radius: 26px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--hairline);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      padding: 22px;
+      box-shadow: var(--shadow);
+      text-align:center;
+    }
+    .permCard h2{ font-size: 18px; margin-top: 12px; }
+    .permCard p{ color: var(--muted); margin-top: 10px; line-height:1.7; font-size: 14px; }
+    .primaryBtn{
+      margin-top: 16px;
+      width: 100%;
+      border: none;
+      background: var(--primary);
+      color: #fff;
+      font-weight: 800;
+      padding: 14px 16px;
+      border-radius: 16px;
+      cursor:pointer;
+      box-shadow: 0 18px 35px rgba(11,95,255,.25);
+      font-size: 15px;
+    }
+    .primaryBtn:active{ transform: scale(.99); }
+
+    /* Modal */
+    .modal{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,.92);
+      z-index: 200;
+      display:none;
+      padding: calc(14px + var(--safe-top)) 14px calc(14px + var(--safe-bottom));
+    }
+    .modal.active{ display:flex; flex-direction:column; gap:12px; }
+
+    .modalHeader{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 12px 14px;
+      border-radius: 18px;
+      border: 1px solid var(--hairline);
+      background: rgba(20,24,28,.56);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .modalHeader strong{ font-size: 15px; }
+    .closeBtn{
+      border: 1px solid var(--hairline);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      padding: 8px 10px;
+      border-radius: 14px;
+      cursor:pointer;
+    }
+
+    .modalBody{
+      flex:1;
+      overflow:auto;
+      border-radius: 22px;
+      border: 1px solid var(--hairline);
+      background: rgba(20,24,28,.56);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 14px;
+    }
+
+    .preview{
+      width:100%;
+      border-radius: 18px;
+      border: 1px solid var(--hairline);
+      margin-bottom: 14px;
+      display:block;
+    }
+
+    .card{
+      border-radius: 18px;
+      border: 1px solid var(--hairline);
+      background: rgba(255,255,255,.06);
+      padding: 14px;
+    }
+
+    .statusRow{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .badge{
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-weight: 900;
+      font-size: 13px;
+      border: 1px solid var(--hairline);
+      display:inline-flex; align-items:center; gap:8px;
+    }
+    .badge.ok{ background: rgba(25,195,125,.14); border-color: rgba(25,195,125,.45); }
+    .badge.no{ background: rgba(239,68,68,.14); border-color: rgba(239,68,68,.45); }
+    .badge.maybe{ background: rgba(245,158,11,.14); border-color: rgba(245,158,11,.45); }
+
+    .meta{ color: var(--muted); font-size: 13px; margin-top: 10px; }
+    .bar{
+      height: 10px; border-radius: 999px; background: rgba(255,255,255,.10);
+      margin-top: 10px; overflow:hidden;
+      border: 1px solid var(--hairline);
+    }
+    .fill{ height:100%; width:0%; transition: width 600ms ease; }
+
+    .msg{
+      margin-top: 12px;
+      color: rgba(245,247,250,.9);
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .actions{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .ghost{
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      padding: 12px 14px;
+      border-radius: 16px;
+      font-weight: 800;
+      cursor:pointer;
+    }
+
+    /* Toast */
+    .toast{
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: calc(110px + var(--safe-bottom));
+      z-index: 300;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--hairline);
+      background: rgba(20,24,28,.72);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: var(--text);
+      font-size: 13px;
+      display:none;
+      max-width: 92vw;
+      text-align:center;
+      box-shadow: 0 16px 50px rgba(0,0,0,.55);
+    }
+    .toast.show{ display:block; }
+  </style>
 </head>
 
 <body>
 
-<div id="hud">اختر نوع الفحص ثم اضغط: تثبيت السطح</div>
+  <!-- Permission -->
+  <div id="perm" class="perm">
+    <div class="permCard">
+      <div style="font-size:64px">📷</div>
+      <h2 id="permTitle">الوصول للكاميرا مطلوب</h2>
+      <p id="permDesc">تستخدم هذه الخدمة الكاميرا لإجراء فحص ميداني وفق ضوابط الجهة، دون حفظ الصور محليًا إلا عند الطلب.</p>
+      <button class="primaryBtn" id="permBtn">السماح بالوصول</button>
+      <p style="margin-top:12px; font-size:12px; color: var(--muted);">
+        سيتم تشغيل الكاميرا فقط أثناء استخدام الشاشة.
+      </p>
+    </div>
+  </div>
 
-<div id="controls">
-  <button onclick="setMode('angle')">📐 زاوية جدار/أرض</button>
-  <button onclick="setMode('vent')">🌬️ التهوية</button>
-  <button onclick="setMode('trash')">🗑️ النفايات</button>
-  <button onclick="setMode('floor')">⬜ الأرضيات</button>
-  <button class="secondary" onclick="capture()">تثبيت السطح</button>
-</div>
+  <!-- Stage -->
+  <div class="stage" id="stage" style="display:none;">
+    <video id="video" autoplay playsinline muted></video>
+    <canvas id="captureCanvas"></canvas>
+    <canvas id="overlay"></canvas>
 
-<script type="module">
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.159/build/three.module.js";
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo">م</div>
+        <div class="titleWrap">
+          <div class="title" id="appTitle">ملتزم — كاميرا الفحص</div>
+          <div class="subtitle" id="appSub">خدمة فحص ميداني — نسخة تجريبية</div>
+        </div>
+      </div>
 
-let scene, camera, renderer;
-let xrSession, refSpace, hitTestSource;
-let lastPose = null;
+      <div class="topActions">
+        <button class="iconBtn" id="langBtn" title="تبديل اللغة">
+          🌐 <span id="langLabel">EN</span>
+        </button>
+      </div>
+    </div>
 
-let mode = null;
-let floorNormal = null;
+    <div class="hint" id="hint">وجّه الكاميرا نحو المنطقة المراد فحصها</div>
 
-const hud = document.getElementById("hud");
+    <div class="sheet">
+      <div class="sheetCard">
+        <div class="types" id="types">
+          <button class="chip active" data-type="4.5">📐 زوايا 45°</button>
+          <button class="chip" data-type="4.7">🌬️ التهوية</button>
+          <button class="chip" data-type="5.8">🗑️ النفايات</button>
+          <button class="chip" data-type="defects">🔧 العيوب</button>
+        </div>
 
-init().catch(err => {
-  console.error(err);
-  alert("حدث خطأ في تشغيل AR. تأكد أنك تستخدم Chrome على Android وأن الجهاز يدعم ARCore.");
-});
+        <div class="captureRow">
+          <button class="miniBtn" id="switchBtn" title="تبديل الكاميرا">🔄</button>
+          <button class="capture" id="captureBtn" title="التقاط">📷</button>
+          <button class="miniBtn" id="stopBtn" title="إيقاف الكاميرا">⏻</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-async function init() {
-  if (!navigator.xr) {
-    alert("WebXR غير مدعوم على هذا المتصفح/الجهاز. استخدم Chrome على Android.");
-    return;
+  <!-- Modal -->
+  <div class="modal" id="modal">
+    <div class="modalHeader">
+      <strong id="modalTitle">نتيجة الفحص</strong>
+      <button class="closeBtn" id="modalClose">إغلاق ✕</button>
+    </div>
+
+    <div class="modalBody">
+      <img id="preview" class="preview" alt="Captured" />
+      <div class="card">
+        <div class="statusRow">
+          <div id="badge" class="badge maybe">⏳ جاري التحليل</div>
+          <div style="text-align:left">
+            <div style="font-weight:900" id="ruleLabel">القاعدة 4.5</div>
+            <div class="meta" id="confText">مستوى الثقة: —</div>
+          </div>
+        </div>
+
+        <div class="bar"><div class="fill" id="fill"></div></div>
+        <div class="msg" id="msg">يتم الآن معالجة الصورة…</div>
+
+        <div class="actions">
+          <button class="ghost" id="retryBtn">إعادة التحليل</button>
+          <button class="primaryBtn" id="newBtn" style="margin:0;">فحص جديد</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+  // ===== State =====
+  let stream = null;
+  let currentLang = 'ar';
+  let selectedType = '4.5';
+  let facingMode = 'environment'; // or 'user'
+  let lastBlob = null;
+
+  const t = {
+    ar: {
+      appTitle: 'ملتزم — كاميرا الفحص',
+      appSub: 'خدمة فحص ميداني — نسخة تجريبية',
+      hint: 'وجّه الكاميرا نحو المنطقة المراد فحصها',
+      permTitle: 'الوصول للكاميرا مطلوب',
+      permDesc: 'تستخدم هذه الخدمة الكاميرا لإجراء فحص ميداني وفق ضوابط الجهة، دون حفظ الصور محليًا إلا عند الطلب.',
+      permBtn: 'السماح بالوصول',
+      modalTitle: 'نتيجة الفحص',
+      rule: (x)=> x==='defects' ? 'فحص العيوب' : `القاعدة ${x}`,
+      retry: 'إعادة التحليل',
+      newScan: 'فحص جديد',
+      close: 'إغلاق ✕',
+      lang: 'EN',
+    },
+    en: {
+      appTitle: 'Multazim — Inspection Camera',
+      appSub: 'Field inspection service — Beta',
+      hint: 'Point the camera at the area to inspect',
+      permTitle: 'Camera access required',
+      permDesc: 'This service uses the camera to perform on-site checks under agency policies. Images are not stored unless requested.',
+      permBtn: 'Allow access',
+      modalTitle: 'Inspection Result',
+      rule: (x)=> x==='defects' ? 'Defects Scan' : `Rule ${x}`,
+      retry: 'Retry',
+      newScan: 'New Scan',
+      close: 'Close ✕',
+      lang: 'AR',
+    }
+  };
+
+  // ===== Helpers =====
+  function toast(msg){
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(()=> el.classList.remove('show'), 2400);
   }
 
-  scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera();
+  function setTexts(){
+    const L = t[currentLang];
+    document.documentElement.lang = currentLang;
+    document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
 
-  renderer = new THREE.WebGLRenderer({ alpha:true, antialias:true });
-  renderer.xr.enabled = true;
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(renderer.domElement);
+    document.getElementById('appTitle').textContent = L.appTitle;
+    document.getElementById('appSub').textContent = L.appSub;
+    document.getElementById('hint').textContent = L.hint;
 
-  const light = new THREE.HemisphereLight(0xffffff, 0x444444);
-  scene.add(light);
+    document.getElementById('permTitle').textContent = L.permTitle;
+    document.getElementById('permDesc').textContent = L.permDesc;
+    document.getElementById('permBtn').textContent = L.permBtn;
 
-  xrSession = await navigator.xr.requestSession("immersive-ar", {
-    requiredFeatures: ["hit-test"]
-  });
+    document.getElementById('modalTitle').textContent = L.modalTitle;
+    document.getElementById('retryBtn').textContent = L.retry;
+    document.getElementById('newBtn').textContent = L.newScan;
+    document.getElementById('modalClose').textContent = L.close;
+    document.getElementById('langLabel').textContent = L.lang;
 
-  renderer.xr.setSession(xrSession);
-
-  refSpace = await xrSession.requestReferenceSpace("local");
-  const viewerSpace = await xrSession.requestReferenceSpace("viewer");
-  hitTestSource = await xrSession.requestHitTestSource({ space: viewerSpace });
-
-  renderer.setAnimationLoop(render);
-
-  hud.innerText = "جاهز — اختر نوع الفحص";
-}
-
-function render(_, frame) {
-  if (!frame) return;
-  const hits = frame.getHitTestResults(hitTestSource);
-  if (hits.length > 0) lastPose = hits[0].getPose(refSpace);
-  renderer.render(scene, camera);
-}
-
-window.setMode = function(m) {
-  mode = m;
-  floorNormal = null;
-
-  if (m === "angle") hud.innerText = "فحص الزاوية: وجّه للأرض واضغط تثبيت السطح";
-  if (m === "vent") hud.innerText = "فحص التهوية: وجّه للجدار قرب فتحة التهوية واضغط تثبيت السطح";
-  if (m === "trash") hud.innerText = "فحص النفايات: وجّه للأرض قرب سلة النفايات واضغط تثبيت السطح";
-  if (m === "floor") hud.innerText = "فحص الأرضيات: وجّه للأرض واضغط تثبيت السطح";
-};
-
-window.capture = function() {
-  if (!lastPose || !mode) {
-    hud.innerText = "اختر نوع الفحص أولاً ثم حاول مرة أخرى";
-    return;
+    document.getElementById('ruleLabel').textContent = L.rule(selectedType);
   }
 
-  const normal = getNormal(lastPose);
+  async function startCamera(){
+    stopCamera(); // ensure no double streams
+    try{
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode, width: { ideal: 1280 }, height: { ideal: 720 } },
+        audio: false
+      });
 
-  if (mode === "angle") {
-    if (!floorNormal) {
-      floorNormal = normal;
-      hud.innerText = "تم تثبيت الأرض — الآن وجّه للجدار واضغط تثبيت السطح";
-    } else {
-      const angle = angleBetween(floorNormal, normal);
-      hud.innerText = `زاوية الجدار/الأرض ≈ ${angle.toFixed(1)}° (المفترض قريب من 90°)`;
+      const video = document.getElementById('video');
+      video.srcObject = stream;
+
+      document.getElementById('perm').style.display = 'none';
+      document.getElementById('stage').style.display = 'block';
+
+      await video.play();
+      resizeOverlay();
+      drawLoop();
+
+    }catch(e){
+      toast(currentLang==='ar'
+        ? 'تعذّر تشغيل الكاميرا. تأكد من منح الإذن.'
+        : 'Unable to start camera. Please grant permission.'
+      );
+      console.error(e);
     }
   }
 
-  if (mode === "vent") {
-    const verticality = Math.abs(normal.y);
-    hud.innerText = verticality < 0.3 ? "✔️ تم اكتشاف جدار عمودي صالح (للتهوية)" : "❌ السطح غير عمودي — قرّب للجدار";
+  function stopCamera(){
+    if(stream){
+      stream.getTracks().forEach(tr=> tr.stop());
+      stream = null;
+    }
   }
 
-  if (mode === "trash") {
-    const horizontality = Math.abs(normal.y);
-    hud.innerText = horizontality > 0.9 ? "✔️ تم اكتشاف أرض أفقية صالحة (سلة النفايات)" : "❌ السطح غير أفقي — وجّه للأرض";
+  function resizeOverlay(){
+    const overlay = document.getElementById('overlay');
+    // Make canvas match CSS pixels
+    const rect = overlay.getBoundingClientRect();
+    overlay.width = Math.floor(rect.width * devicePixelRatio);
+    overlay.height = Math.floor(rect.height * devicePixelRatio);
   }
 
-  if (mode === "floor") {
-    const flatness = Math.abs(normal.y);
-    hud.innerText = flatness > 0.95 ? "✔️ الأرضية مستوية" : "⚠️ الأرضية غير مستوية";
+  function drawGuide(ctx, type){
+    const w = ctx.canvas.width;
+    const h = ctx.canvas.height;
+    const cx = w/2, cy = h/2;
+
+    ctx.clearRect(0,0,w,h);
+    ctx.save();
+    ctx.scale(devicePixelRatio, devicePixelRatio); // we already used DPR in canvas size; optional safeguard
+    ctx.restore();
+
+    // draw in actual canvas pixels
+    ctx.strokeStyle = 'rgba(11,95,255,.95)';
+    ctx.lineWidth = 4;
+    ctx.shadowColor = 'rgba(0,0,0,.55)';
+    ctx.shadowBlur = 8;
+
+    if(type === '4.5'){
+      const size = Math.min(w,h)*0.38;
+      ctx.beginPath();
+      ctx.moveTo(cx - size/2, cy);
+      ctx.lineTo(cx + size/2, cy);
+      ctx.moveTo(cx, cy - size/2);
+      ctx.lineTo(cx, cy + size/2);
+      ctx.moveTo(cx - size/3, cy - size/3);
+      ctx.lineTo(cx + size/3, cy + size/3);
+      ctx.stroke();
+
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = 'rgba(245,247,250,.92)';
+      ctx.font = '900 28px system-ui, Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('45°', cx, cy - size/2 - 18);
+    } else if(type === '4.7'){
+      const rw = w*0.62;
+      const rh = h*0.36;
+      ctx.strokeRect(cx - rw/2, cy - rh/2, rw, rh);
+    } else if(type === '5.8'){
+      const r = Math.min(w,h)*0.26;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI*2);
+      ctx.stroke();
+    } else {
+      ctx.strokeStyle = 'rgba(11,95,255,.25)';
+      ctx.lineWidth = 2;
+      for(let i=1;i<4;i++){
+        ctx.beginPath();
+        ctx.moveTo(w*i/4, 0);
+        ctx.lineTo(w*i/4, h);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(0, h*i/4);
+        ctx.lineTo(w, h*i/4);
+        ctx.stroke();
+      }
+    }
   }
-};
 
-function getNormal(pose) {
-  const q = pose.transform.orientation;
-  const quat = new THREE.Quaternion(q.x, q.y, q.z, q.w);
-  const normal = new THREE.Vector3(0, 1, 0);
-  return normal.applyQuaternion(quat).normalize();
-}
+  let rafId = null;
+  function drawLoop(){
+    const overlay = document.getElementById('overlay');
+    const ctx = overlay.getContext('2d');
+    const loop = ()=>{
+      drawGuide(ctx, selectedType);
+      rafId = requestAnimationFrame(loop);
+    };
+    loop();
+  }
 
-function angleBetween(a, b) {
-  const dot = THREE.MathUtils.clamp(a.dot(b), -1, 1);
-  return THREE.MathUtils.radToDeg(Math.acos(dot));
-}
+  function stopOverlayLoop(){
+    if(rafId) cancelAnimationFrame(rafId);
+    rafId = null;
+  }
 
-window.addEventListener("resize", () => {
-  renderer?.setSize(window.innerWidth, window.innerHeight);
-});
+  function setType(type){
+    selectedType = type;
+    document.querySelectorAll('.chip').forEach(b=>{
+      b.classList.toggle('active', b.dataset.type===type);
+    });
+    setTexts();
+  }
+
+  async function capture(){
+    const btn = document.getElementById('captureBtn');
+    btn.classList.add('processing');
+
+    try{
+      const video = document.getElementById('video');
+      const canvas = document.getElementById('captureCanvas');
+      const ctx = canvas.getContext('2d');
+
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0);
+
+      // Blob بدل Base64 (أفضل للموبايل والـAPI)
+      lastBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.86));
+
+      // preview
+      const url = URL.createObjectURL(lastBlob);
+      document.getElementById('preview').src = url;
+
+      openModalLoading();
+      // هنا مكان التحليل الحقيقي:
+      // const result = await analyzeViaAPI(lastBlob, selectedType);
+      // showResult(result);
+
+      // حاليا: محاكاة سريعة
+      setTimeout(()=> showResult(mockResult()), 900);
+
+    }catch(e){
+      toast(currentLang==='ar' ? 'فشل التقاط الصورة.' : 'Capture failed.');
+      console.error(e);
+    }finally{
+      btn.classList.remove('processing');
+    }
+  }
+
+  function openModalLoading(){
+    const L = t[currentLang];
+    document.getElementById('modal').classList.add('active');
+    document.getElementById('badge').className = 'badge maybe';
+    document.getElementById('badge').textContent = currentLang==='ar' ? '⏳ جاري التحليل' : '⏳ Analyzing';
+    document.getElementById('confText').textContent = currentLang==='ar' ? 'مستوى الثقة: —' : 'Confidence: —';
+    document.getElementById('fill').style.width = '0%';
+    document.getElementById('fill').style.background = 'linear-gradient(90deg, rgba(245,158,11,.9), rgba(11,95,255,.9))';
+    document.getElementById('msg').textContent = currentLang==='ar'
+      ? 'يتم الآن معالجة الصورة…'
+      : 'Processing the image…';
+    document.getElementById('ruleLabel').textContent = L.rule(selectedType);
+  }
+
+  function closeModal(){
+    document.getElementById('modal').classList.remove('active');
+    const img = document.getElementById('preview');
+    if(img.src.startsWith('blob:')) URL.revokeObjectURL(img.src);
+    img.src = '';
+  }
+
+  function mockResult(){
+    const pick = Math.random();
+    if(pick < 0.45){
+      return { status:'compliant', confidence: 92 + Math.floor(Math.random()*6),
+        msgAr:'تم اكتشاف المواصفة المطلوبة — مطابق للمعايير.',
+        msgEn:'Required specification detected — compliant.' };
+    } else if(pick < 0.8){
+      return { status:'non-compliant', confidence: 78 + Math.floor(Math.random()*10),
+        msgAr:'تم رصد عدم مطابقة — يلزم إجراء تصحيحي.',
+        msgEn:'Non-compliance detected — corrective action required.' };
+    }
+    return { status:'uncertain', confidence: 55 + Math.floor(Math.random()*18),
+      msgAr:'غير قادر على التحديد بوضوح — يُنصح بإعادة الالتقاط مع إضاءة أفضل.',
+      msgEn:'Unable to determine — retake with better lighting.' };
+  }
+
+  function showResult(r){
+    const fill = document.getElementById('fill');
+    const badge = document.getElementById('badge');
+    const confText = document.getElementById('confText');
+    const msg = document.getElementById('msg');
+
+    const map = {
+      compliant: { cls:'ok', color:'linear-gradient(90deg, rgba(25,195,125,.95), rgba(11,95,255,.65))',
+        labelAr:'✓ مطابق', labelEn:'✓ Compliant' },
+      'non-compliant': { cls:'no', color:'linear-gradient(90deg, rgba(239,68,68,.95), rgba(245,158,11,.55))',
+        labelAr:'✕ غير مطابق', labelEn:'✕ Non-Compliant' },
+      uncertain: { cls:'maybe', color:'linear-gradient(90deg, rgba(245,158,11,.95), rgba(11,95,255,.55))',
+        labelAr:'؟ غير مؤكد', labelEn:'؟ Uncertain' }
+    };
+
+    const m = map[r.status];
+    badge.className = 'badge ' + m.cls;
+    badge.textContent = (currentLang==='ar') ? m.labelAr : m.labelEn;
+
+    confText.textContent = (currentLang==='ar')
+      ? `مستوى الثقة: ${r.confidence}%`
+      : `Confidence: ${r.confidence}%`;
+
+    fill.style.background = m.color;
+    requestAnimationFrame(()=> { fill.style.width = r.confidence + '%'; });
+
+    msg.textContent = (currentLang==='ar') ? r.msgAr : r.msgEn;
+  }
+
+  // مثال جاهز لربط API حقيقي
+  async function analyzeViaAPI(imageBlob, ruleType){
+    const form = new FormData();
+    form.append('image', imageBlob, 'capture.jpg');
+    form.append('rule', ruleType);
+
+    const res = await fetch('/api/inspect', { method:'POST', body: form });
+    if(!res.ok) throw new Error('API failed');
+    return await res.json();
+  }
+
+  // ===== Events =====
+  document.getElementById('permBtn').addEventListener('click', startCamera);
+
+  document.getElementById('langBtn').addEventListener('click', ()=>{
+    currentLang = (currentLang==='ar') ? 'en' : 'ar';
+    setTexts();
+  });
+
+  document.getElementById('types').addEventListener('click', (e)=>{
+    const btn = e.target.closest('.chip');
+    if(!btn) return;
+    setType(btn.dataset.type);
+  });
+
+  document.getElementById('captureBtn').addEventListener('click', capture);
+
+  document.getElementById('retryBtn').addEventListener('click', ()=>{
+    openModalLoading();
+    setTimeout(()=> showResult(mockResult()), 800);
+  });
+
+  document.getElementById('newBtn').addEventListener('click', closeModal);
+  document.getElementById('modalClose').addEventListener('click', closeModal);
+
+  document.getElementById('stopBtn').addEventListener('click', ()=>{
+    stopOverlayLoop();
+    stopCamera();
+    document.getElementById('stage').style.display = 'none';
+    document.getElementById('perm').style.display = 'flex';
+    toast(currentLang==='ar' ? 'تم إيقاف الكاميرا.' : 'Camera stopped.');
+  });
+
+  document.getElementById('switchBtn').addEventListener('click', async ()=>{
+    facingMode = (facingMode === 'environment') ? 'user' : 'environment';
+    toast(currentLang==='ar'
+      ? (facingMode==='environment' ? 'الكاميرا الخلفية' : 'الكاميرا الأمامية')
+      : (facingMode==='environment' ? 'Rear camera' : 'Front camera')
+    );
+    await startCamera();
+  });
+
+  window.addEventListener('resize', resizeOverlay);
+
+  // init
+  setTexts();
 </script>
-
 </body>
 </html>
