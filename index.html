@@ -21,25 +21,39 @@
       --hairline: rgba(255,255,255,.12);
       --safe-top: env(safe-area-inset-top);
       --safe-bottom: env(safe-area-inset-bottom);
+
+      /* حل مشكلة 100vh على الموبايل */
+      --vh: 1vh;
     }
+
     *{box-sizing:border-box;margin:0;padding:0;}
     body{
       font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
       background:var(--bg);
       color:var(--text);
-      height:100vh;
+      height: calc(var(--vh) * 100);
       overflow:hidden;
     }
-    .stage{position:relative;width:100vw;height:100vh;background:#000;}
+
+    .stage{
+      position:relative;
+      width:100vw;
+      height: calc(var(--vh) * 100);
+      background:#000;
+      overflow:hidden;
+    }
+
     #video{position:absolute; inset:0;width:100%;height:100%;object-fit:cover;}
     #captureCanvas{display:none;}
     #overlay{position:absolute; inset:0;width:100%;height:100%;pointer-events:none;}
+
+    /* Top bar */
     .topbar{
       position:absolute; top:0; left:0; right:0;
-      padding: calc(14px + var(--safe-top)) 16px 12px;
-      display:flex; align-items:center; justify-content:space-between; gap:12px;
-      z-index:10;
-      background: linear-gradient(180deg, rgba(0,0,0,.75) 0%, rgba(0,0,0,0) 100%);
+      padding: calc(12px + var(--safe-top)) 14px 10px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      z-index:20;
+      background: linear-gradient(180deg, rgba(0,0,0,.78) 0%, rgba(0,0,0,0) 100%);
     }
     .brand{display:flex; align-items:center; gap:10px; min-width:0;}
     .logo{
@@ -52,6 +66,7 @@
     .titleWrap{display:flex; flex-direction:column; min-width:0;}
     .title{font-size:15px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .subtitle{font-size:12px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
     .topActions{display:flex; align-items:center; gap:10px;}
     .iconBtn{
       border:1px solid var(--hairline);
@@ -66,12 +81,13 @@
       font-weight:800;
       font-size:13px;
     }
-    .iconBtn:active{transform:scale(.98);}
+
+    /* Hint + CV pill */
     .hint{
       position:absolute;
-      top: calc(82px + var(--safe-top));
+      top: calc(78px + var(--safe-top));
       left:50%; transform: translateX(-50%);
-      z-index:10;
+      z-index:20;
       padding:10px 14px;
       border-radius:999px;
       border:1px solid var(--hairline);
@@ -83,11 +99,12 @@
       text-align:center;
       font-size:14px;
     }
+
     .cvPill{
       position:absolute;
-      top: calc(128px + var(--safe-top));
+      top: calc(124px + var(--safe-top));
       left:50%; transform: translateX(-50%);
-      z-index:10;
+      z-index:20;
       padding:10px 14px;
       border-radius:999px;
       border:1px solid var(--hairline);
@@ -102,29 +119,35 @@
       justify-content:center;
       box-shadow: 0 10px 35px rgba(0,0,0,.45);
       max-width:92vw;
+      flex-wrap:wrap;
     }
     .cvDot{width:10px;height:10px;border-radius:999px;background: var(--warning);}
     .cvVals{color: var(--muted); font-weight:800;}
+
+    /* Bottom sheet — خليها فوق شريط المتصفح + safe area */
     .sheet{
       position:absolute; left:0; right:0; bottom:0;
-      padding:10px 14px calc(14px + var(--safe-bottom));
-      z-index:10;
+      padding: 10px 12px calc(12px + var(--safe-bottom));
+      z-index:25;
       background: linear-gradient(0deg, rgba(0,0,0,.92) 0%, rgba(0,0,0,0) 100%);
     }
+
     .sheetCard{
       border: 1px solid var(--hairline);
-      background: rgba(20,24,28,.56);
+      background: rgba(20,24,28,.60);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border-radius: var(--radius-xl);
       padding: 12px;
       box-shadow: var(--shadow);
     }
+
     .types{
       display:flex; gap:10px; overflow-x:auto; padding: 6px 4px 10px;
       scrollbar-width:none;
     }
     .types::-webkit-scrollbar{display:none;}
+
     .chip{
       border: 1px solid var(--hairline);
       background: rgba(255,255,255,.06);
@@ -143,7 +166,7 @@
       border-color: rgba(11,95,255,.65);
       box-shadow: 0 12px 30px rgba(11,95,255,.14);
     }
-    .chip:active{transform:scale(.98);}
+
     .captureRow{
       display:grid;
       grid-template-columns: 46px 1fr 46px;
@@ -160,7 +183,6 @@
       display:flex; align-items:center; justify-content:center;
       font-size:18px;
     }
-    .miniBtn:active{transform:scale(.98);}
     .capture{
       width:100%;
       height:50px;
@@ -173,12 +195,11 @@
       display:flex; align-items:center; justify-content:center;
       font-size:15px;
       font-weight:900;
-      transition: opacity .2s ease;
       gap:10px;
     }
     .capture.processing{opacity:.65;pointer-events:none;filter: grayscale(.35);}
-    .capture:active{transform:scale(.99);}
 
+    /* Permission screen */
     .perm{
       position:fixed; inset:0;
       display:flex; align-items:center; justify-content:center;
@@ -215,91 +236,8 @@
       box-shadow: 0 18px 35px rgba(11,95,255,.25);
       font-size:15px;
     }
-    .primaryBtn:active{transform:scale(.99);}
 
-    .modal{
-      position:fixed; inset:0;
-      background: rgba(0,0,0,.92);
-      z-index:200;
-      display:none;
-      padding: calc(14px + var(--safe-top)) 14px calc(14px + var(--safe-bottom));
-    }
-    .modal.active{display:flex;flex-direction:column;gap:12px;}
-    .modalHeader{
-      display:flex;align-items:center;justify-content:space-between;
-      padding:12px 14px;
-      border-radius:18px;
-      border:1px solid var(--hairline);
-      background: rgba(20,24,28,.56);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-    }
-    .modalHeader strong{font-size:15px;}
-    .closeBtn{
-      border:1px solid var(--hairline);
-      background: rgba(255,255,255,.06);
-      color: var(--text);
-      padding:8px 10px;
-      border-radius:14px;
-      cursor:pointer;
-    }
-    .modalBody{
-      flex:1;
-      overflow:auto;
-      border-radius:22px;
-      border:1px solid var(--hairline);
-      background: rgba(20,24,28,.56);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      padding:14px;
-    }
-    .preview{
-      width:100%;
-      border-radius:18px;
-      border:1px solid var(--hairline);
-      margin-bottom:14px;
-      display:block;
-    }
-    .card{
-      border-radius:18px;
-      border:1px solid var(--hairline);
-      background: rgba(255,255,255,.06);
-      padding:14px;
-    }
-    .statusRow{display:flex;align-items:center;justify-content:space-between;gap:10px;}
-    .badge{
-      padding:8px 12px;
-      border-radius:999px;
-      font-weight:900;
-      font-size:13px;
-      border:1px solid var(--hairline);
-      display:inline-flex;align-items:center;gap:8px;
-    }
-    .badge.ok{background: rgba(25,195,125,.14); border-color: rgba(25,195,125,.45);}
-    .badge.no{background: rgba(239,68,68,.14); border-color: rgba(239,68,68,.45);}
-    .badge.maybe{background: rgba(245,158,11,.14); border-color: rgba(245,158,11,.45);}
-    .meta{color:var(--muted);font-size:13px;margin-top:10px;}
-    .bar{
-      height:10px;border-radius:999px;background: rgba(255,255,255,.10);
-      margin-top:10px;overflow:hidden;border:1px solid var(--hairline);
-    }
-    .fill{height:100%;width:0%;transition:width 600ms ease;}
-    .msg{margin-top:12px;color: rgba(245,247,250,.9);line-height:1.7;font-size:14px;}
-    .actions{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-      margin-top:12px;
-    }
-    .ghost{
-      border:1px solid rgba(255,255,255,.18);
-      background: rgba(255,255,255,.06);
-      color: var(--text);
-      padding:12px 14px;
-      border-radius:16px;
-      font-weight:900;
-      cursor:pointer;
-    }
+    /* Toast */
     .toast{
       position:fixed;
       left:50%;
@@ -322,10 +260,7 @@
     .toast.show{display:block;}
   </style>
 
-  <!-- EmailJS (للتجربة) -->
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-
-  <!-- OpenCV.js (Computer Vision) -->
+  <!-- OpenCV.js -->
   <script async src="https://docs.opencv.org/4.x/opencv.js"></script>
 </head>
 
@@ -334,15 +269,12 @@
   <div id="perm" class="perm">
     <div class="permCard">
       <div style="font-size:64px">📷</div>
-      <h2 id="permTitle">الوصول للكاميرا مطلوب</h2>
-      <p id="permDesc">
-        سيقوم التطبيق بالتقاط صورة ثم اكتشاف خط الأرض وخط الجدار تلقائيًا (Computer Vision)
-        وحساب زاوية التقاطع بينهما.
+      <h2>الوصول للكاميرا مطلوب</h2>
+      <p>
+        التطبيق سيعرض منصة (Overlay) مختلفة حسب نوع الفحص.
+        لزوايا 45° سيستخدم Computer Vision لاكتشاف خطين وحساب الزاوية.
       </p>
       <button class="primaryBtn" id="permBtn">السماح والبدء</button>
-      <p style="margin-top:12px; font-size:12px; color: var(--muted);">
-        ملاحظة: اكتشاف الخطوط يحتاج تباين واضح (حافة الجدار/الأرض + إضاءة كافية).
-      </p>
     </div>
   </div>
 
@@ -356,19 +288,19 @@
         <div class="logo">م</div>
         <div class="titleWrap">
           <div class="title" id="appTitle">ملتزم — كاميرا الفحص</div>
-          <div class="subtitle" id="appSub">فحص زاوية الجدار/الأرض — Computer Vision</div>
+          <div class="subtitle" id="appSub">Computer Vision — فحص زاوية الجدار/الأرض</div>
         </div>
       </div>
       <div class="topActions">
-        <button class="iconBtn" id="langBtn" title="تبديل اللغة">🌐 <span id="langLabel">EN</span></button>
+        <button class="iconBtn" id="langBtn">🌐 <span id="langLabel">EN</span></button>
       </div>
     </div>
 
-    <div class="hint" id="hint">وجّه الكاميرا نحو زاوية التقاء الجدار بالأرض (الحافة في منتصف الشاشة)</div>
+    <div class="hint" id="hint">وجّه الكاميرا نحو المنطقة المراد فحصها</div>
 
     <div class="cvPill" id="cvPill">
       <span id="cvDot" class="cvDot"></span>
-      <span id="cvText">جاهز — اضغط “التقاط + تحليل”</span>
+      <span id="cvText">جاهز</span>
       <span id="cvVals" class="cvVals"></span>
     </div>
 
@@ -383,38 +315,10 @@
 
         <div class="captureRow">
           <button class="miniBtn" id="switchBtn" title="تبديل الكاميرا">🔄</button>
-          <button class="capture" id="captureBtn" title="التقاط وتحليل">
+          <button class="capture" id="captureBtn">
             📷 <span id="capLabel">التقاط + تحليل</span>
           </button>
-          <button class="miniBtn" id="stopBtn" title="إيقاف الكاميرا">⏻</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal" id="modal">
-    <div class="modalHeader">
-      <strong id="modalTitle">نتيجة الفحص</strong>
-      <button class="closeBtn" id="modalClose">إغلاق ✕</button>
-    </div>
-
-    <div class="modalBody">
-      <img id="preview" class="preview" alt="Captured" />
-      <div class="card">
-        <div class="statusRow">
-          <div id="badge" class="badge maybe">⏳ جاري التحليل</div>
-          <div style="text-align:left">
-            <div style="font-weight:900" id="ruleLabel">القاعدة 4.5</div>
-            <div class="meta" id="confText">مستوى الثقة: —</div>
-          </div>
-        </div>
-
-        <div class="bar"><div class="fill" id="fill"></div></div>
-        <div class="msg" id="msg">يتم الآن استخراج الخطوط وحساب الزاوية…</div>
-
-        <div class="actions">
-          <button class="ghost" id="retryBtn">إعادة التحليل</button>
-          <button class="primaryBtn" id="newBtn" style="margin:0;">فحص جديد</button>
+          <button class="miniBtn" id="stopBtn" title="إيقاف">⏻</button>
         </div>
       </div>
     </div>
@@ -423,92 +327,52 @@
   <div class="toast" id="toast"></div>
 
 <script>
-/* =========================
-   EmailJS إعدادات (عدّلها)
-   ========================= */
-const EMAILJS_PUBLIC_KEY  = "PUT_YOUR_PUBLIC_KEY_HERE";
-const EMAILJS_SERVICE_ID  = "PUT_YOUR_SERVICE_ID_HERE";
-const EMAILJS_TEMPLATE_ID = "PUT_YOUR_TEMPLATE_ID_HERE";
-const EMAIL_TO = "a.alamm@datainsight.com.sa";
-emailjs.init(EMAILJS_PUBLIC_KEY);
+/* ===== Fix Mobile VH ===== */
+function setVH(){
+  const vh = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty('--vh', `${vh}px`);
+}
+setVH();
+window.addEventListener('resize', setVH);
 
-/* =========================
-   State
-   ========================= */
+/* ===== State ===== */
 let stream = null;
 let currentLang = 'ar';
 let selectedType = '4.5';
 let facingMode = 'environment';
-let lastBlob = null;
+let lastCV = null; // { angleDeg, confidence, hLine, vLine, intersection, map }
 
-// آخر نتيجة CV
-let lastCV = null; // { angleDeg, confidence, hLine, vLine, intersection, status }
-
-/* =========================
-   Translations
-   ========================= */
+/* ===== i18n ===== */
 const TT = {
   ar: {
     appTitle: 'ملتزم — كاميرا الفحص',
-    appSub: 'فحص زاوية الجدار/الأرض — Computer Vision',
-    hint: 'وجّه الكاميرا نحو زاوية التقاء الجدار بالأرض (الحافة في منتصف الشاشة)',
+    appSub: 'Computer Vision — فحص زاوية الجدار/الأرض',
+    hint45: 'وجّه الكاميرا نحو زاوية التقاء الجدار بالأرض (الحافة في منتصف الشاشة)',
+    hint47: 'ضع فتحة التهوية داخل المستطيل بالكامل',
+    hint58: 'ضع سلة النفايات داخل الإطار بالكامل',
+    hintDef: 'ضع منطقة العيب داخل المربع وقرّب الكاميرا',
     cap: 'التقاط + تحليل',
-    modalTitle: 'نتيجة الفحص',
-    retry: 'إعادة التحليل',
-    newScan: 'فحص جديد',
-    close: 'إغلاق ✕',
     lang: 'EN',
-    rule: (x)=> x==='defects' ? 'فحص العيوب' : `القاعدة ${x}`,
-    ready: 'جاهز — اضغط “التقاط + تحليل”',
-    cvWorking: 'جاري اكتشاف الخطوط…',
-    cvOk: (a)=> `تم اكتشاف الزاوية: ${a.toFixed(1)}°`,
-    cvFail: 'لم ننجح في اكتشاف خطين واضحين. قرّب الكاميرا على الحافة وزد الإضاءة.',
-    emailSent: 'تم إرسال النتيجة بالبريد ✅',
-    emailFail: 'تعذر إرسال البريد. تأكد من إعداد EmailJS.',
-    cameraFail: 'فشل تشغيل الكاميرا. تأكد من منح الإذن.',
-    captureFail: 'فشل التقاط/تحليل الصورة.',
-    needCV: 'لا يوجد نتيجة تحليل لإرسالها.',
-    rule45: 'التحقق من زاوية 45°',
-    compliant: 'مطابق',
-    noncompliant: 'غير مطابق',
-    uncertain: 'غير مؤكد'
+    ready: 'جاهز',
+    working: 'جاري التحليل…',
+    ok: (a)=> `زاوية مكتشفة: ${a.toFixed(1)}°`,
+    fail: 'فشل اكتشاف خطين واضحين — قرّب للحافة وزد الإضاءة'
   },
   en: {
     appTitle: 'Multazim — Inspection Camera',
-    appSub: 'Wall/Floor Angle — Computer Vision',
-    hint: 'Point the camera at the wall/floor edge (keep the edge centered)',
+    appSub: 'Computer Vision — Wall/Floor Angle',
+    hint45: 'Point at the wall/floor edge (keep the edge centered)',
+    hint47: 'Fit the vent opening inside the rectangle',
+    hint58: 'Fit the bin inside the frame',
+    hintDef: 'Place the defect area inside the square and move closer',
     cap: 'Capture + Analyze',
-    modalTitle: 'Inspection Result',
-    retry: 'Retry',
-    newScan: 'New Scan',
-    close: 'Close ✕',
     lang: 'AR',
-    rule: (x)=> x==='defects' ? 'Defects Scan' : `Rule ${x}`,
-    ready: 'Ready — tap “Capture + Analyze”',
-    cvWorking: 'Detecting lines…',
-    cvOk: (a)=> `Angle detected: ${a.toFixed(1)}°`,
-    cvFail: 'Could not find two clear lines. Move closer to the edge and improve lighting.',
-    emailSent: 'Result emailed ✅',
-    emailFail: 'Email failed. Check EmailJS setup.',
-    cameraFail: 'Unable to start camera. Please grant permission.',
-    captureFail: 'Capture/analyze failed.',
-    needCV: 'No analysis result available.',
-    rule45: 'Validate 45° angle',
-    compliant: 'Compliant',
-    noncompliant: 'Non-Compliant',
-    uncertain: 'Uncertain'
+    ready: 'Ready',
+    working: 'Analyzing…',
+    ok: (a)=> `Detected angle: ${a.toFixed(1)}°`,
+    fail: 'Could not detect two clear lines — move closer & improve lighting'
   }
 };
-
-/* =========================
-   UI helpers
-   ========================= */
-function toast(msg){
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  setTimeout(()=> el.classList.remove('show'), 2500);
-}
 
 function setTexts(){
   const L = TT[currentLang];
@@ -517,105 +381,65 @@ function setTexts(){
 
   document.getElementById('appTitle').textContent = L.appTitle;
   document.getElementById('appSub').textContent   = L.appSub;
-  document.getElementById('hint').textContent     = L.hint;
-  document.getElementById('modalTitle').textContent = L.modalTitle;
-  document.getElementById('retryBtn').textContent = L.retry;
-  document.getElementById('newBtn').textContent   = L.newScan;
-  document.getElementById('modalClose').textContent = L.close;
-  document.getElementById('langLabel').textContent  = L.lang;
-  document.getElementById('capLabel').textContent   = L.cap;
-  document.getElementById('ruleLabel').textContent  = L.rule(selectedType);
+  document.getElementById('capLabel').textContent = L.cap;
+  document.getElementById('langLabel').textContent = L.lang;
 
-  // الحالة
+  updateHint();
   setCVState('ready');
 }
 
+function updateHint(){
+  const L = TT[currentLang];
+  const el = document.getElementById('hint');
+  if(selectedType==='4.5') el.textContent = L.hint45;
+  else if(selectedType==='4.7') el.textContent = L.hint47;
+  else if(selectedType==='5.8') el.textContent = L.hint58;
+  else el.textContent = L.hintDef;
+}
+
+/* ===== Toast ===== */
+function toast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(()=> el.classList.remove('show'), 2500);
+}
+
+/* ===== CV Pill ===== */
 function setCVState(state, payload){
   const L = TT[currentLang];
   const dot = document.getElementById('cvDot');
   const txt = document.getElementById('cvText');
   const vals = document.getElementById('cvVals');
 
-  if(state === 'ready'){
+  if(state==='ready'){
     dot.style.background = 'var(--warning)';
     txt.textContent = L.ready;
-    vals.textContent = '';
-  } else if(state === 'working'){
+    vals.textContent='';
+  } else if(state==='working'){
     dot.style.background = 'var(--warning)';
-    txt.textContent = L.cvWorking;
-    vals.textContent = '';
-  } else if(state === 'ok'){
+    txt.textContent = L.working;
+    vals.textContent='';
+  } else if(state==='ok'){
     dot.style.background = 'var(--accent)';
-    txt.textContent = L.cvOk(payload.angleDeg);
+    txt.textContent = L.ok(payload.angleDeg);
     vals.textContent = (currentLang==='ar')
       ? `ثقة: ${(payload.confidence*100).toFixed(0)}%`
       : `Conf: ${(payload.confidence*100).toFixed(0)}%`;
-  } else if(state === 'fail'){
+  } else if(state==='fail'){
     dot.style.background = 'var(--danger)';
-    txt.textContent = L.cvFail;
-    vals.textContent = '';
+    txt.textContent = L.fail;
+    vals.textContent='';
   }
 }
 
-function openModalLoading(){
-  const L = TT[currentLang];
-  document.getElementById('modal').classList.add('active');
-  document.getElementById('badge').className = 'badge maybe';
-  document.getElementById('badge').textContent = currentLang==='ar' ? '⏳ جاري التحليل' : '⏳ Analyzing';
-  document.getElementById('confText').textContent = currentLang==='ar' ? 'مستوى الثقة: —' : 'Confidence: —';
-  document.getElementById('fill').style.width = '0%';
-  document.getElementById('fill').style.background = 'linear-gradient(90deg, rgba(245,158,11,.9), rgba(11,95,255,.9))';
-  document.getElementById('msg').textContent = currentLang==='ar'
-    ? 'يتم الآن استخراج الخطوط وحساب الزاوية…'
-    : 'Extracting lines and computing angle…';
-  document.getElementById('ruleLabel').textContent = L.rule(selectedType);
-}
-
-function closeModal(){
-  document.getElementById('modal').classList.remove('active');
-  const img = document.getElementById('preview');
-  if(img.src.startsWith('blob:')) URL.revokeObjectURL(img.src);
-  img.src = '';
-}
-
-function showResultUI(res){
-  const fill = document.getElementById('fill');
-  const badge = document.getElementById('badge');
-  const confText = document.getElementById('confText');
-  const msg = document.getElementById('msg');
-
-  const map = {
-    compliant: { cls:'ok', color:'linear-gradient(90deg, rgba(25,195,125,.95), rgba(11,95,255,.65))',
-      labelAr:'✓ مطابق', labelEn:'✓ Compliant' },
-    'non-compliant': { cls:'no', color:'linear-gradient(90deg, rgba(239,68,68,.95), rgba(245,158,11,.55))',
-      labelAr:'✕ غير مطابق', labelEn:'✕ Non-Compliant' },
-    uncertain: { cls:'maybe', color:'linear-gradient(90deg, rgba(245,158,11,.95), rgba(11,95,255,.55))',
-      labelAr:'؟ غير مؤكد', labelEn:'？ Uncertain' }
-  };
-
-  const m = map[res.status];
-  badge.className = 'badge ' + m.cls;
-  badge.textContent = (currentLang==='ar') ? m.labelAr : m.labelEn;
-
-  confText.textContent = (currentLang==='ar')
-    ? `مستوى الثقة: ${(res.confidence*100).toFixed(0)}%`
-    : `Confidence: ${(res.confidence*100).toFixed(0)}%`;
-
-  fill.style.background = m.color;
-  requestAnimationFrame(()=> { fill.style.width = Math.round(res.confidence*100) + '%'; });
-
-  msg.textContent = res.message;
-}
-
-/* =========================
-   Camera
-   ========================= */
+/* ===== Camera ===== */
 async function startCamera(){
   stopCamera();
   try{
     stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode, width: { ideal: 1280 }, height: { ideal: 720 } },
-      audio: false
+      video: { facingMode, width:{ideal:1280}, height:{ideal:720} },
+      audio:false
     });
     const video = document.getElementById('video');
     video.srcObject = stream;
@@ -626,95 +450,147 @@ async function startCamera(){
     await video.play();
     resizeOverlay();
     drawOverlayLoop();
-
-    setCVState('ready');
   }catch(e){
-    toast(TT[currentLang].cameraFail);
     console.error(e);
+    toast(currentLang==='ar' ? 'فشل تشغيل الكاميرا' : 'Camera start failed');
   }
 }
-
 function stopCamera(){
   if(stream){
-    stream.getTracks().forEach(tr=> tr.stop());
-    stream = null;
+    stream.getTracks().forEach(t=>t.stop());
+    stream=null;
   }
 }
-
 document.getElementById('permBtn').addEventListener('click', startCamera);
 
-/* =========================
-   Overlay drawing (live)
-   - يرسم إرشادات + إن توفرت نتيجة CV يرسم الخطين + المثلث
-   ========================= */
-let rafId = null;
-
+/* ===== Overlay ===== */
+let rafId=null;
 function resizeOverlay(){
   const overlay = document.getElementById('overlay');
   const rect = overlay.getBoundingClientRect();
   overlay.width = Math.floor(rect.width * devicePixelRatio);
   overlay.height = Math.floor(rect.height * devicePixelRatio);
 }
+window.addEventListener('resize', ()=>{ setVH(); resizeOverlay(); });
 
 function drawOverlayLoop(){
   const overlay = document.getElementById('overlay');
   const ctx = overlay.getContext('2d');
 
-  const loop = ()=>{
-    const w = overlay.width, h = overlay.height;
-    ctx.clearRect(0,0,w,h);
+  const loop=()=>{
+    ctx.clearRect(0,0,overlay.width, overlay.height);
 
-    // إرشادات خفيفة
-    drawGuide(ctx, selectedType);
+    // Draw platform based on selected type
+    drawPlatform(ctx, selectedType);
 
-    // إذا لدينا نتيجة CV، ارسم الخطين + المثلث على نفس الإطار (تقريباً)
-    if(lastCV && lastCV.hLine && lastCV.vLine && lastCV.intersection){
+    // If CV result exists and type is 4.5, draw geometry
+    if(selectedType==='4.5' && lastCV && lastCV.hLine && lastCV.vLine && lastCV.intersection){
       drawDetectedGeometry(ctx, lastCV);
     }
+
     rafId = requestAnimationFrame(loop);
   };
   loop();
 }
 
-function stopOverlayLoop(){
-  if(rafId) cancelAnimationFrame(rafId);
-  rafId = null;
-}
-
-function drawGuide(ctx, type){
+function drawPlatform(ctx, type){
   const w = ctx.canvas.width;
   const h = ctx.canvas.height;
   const cx = w/2, cy = h/2;
 
+  // منطقة عمل وسط الشاشة (تجنّب تغطية شريط الأسفل)
+  const topSafe = (170 + (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--safe-top'))||0)) * devicePixelRatio;
+  const bottomSafe = (210 + (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--safe-bottom'))||0)) * devicePixelRatio;
+
+  const usableTop = topSafe;
+  const usableBottom = h - bottomSafe;
+  const usableH = Math.max(200, usableBottom - usableTop);
+  const uy = usableTop + usableH/2;
+
   ctx.save();
-  ctx.shadowColor = 'rgba(0,0,0,.55)';
-  ctx.shadowBlur = 10;
+  ctx.shadowColor='rgba(0,0,0,.55)';
+  ctx.shadowBlur=10;
 
-  ctx.strokeStyle = 'rgba(11,95,255,.25)';
-  ctx.lineWidth = 2;
+  if(type==='4.5'){
+    // إطار مستطيل + خطوط مركزية
+    const rw = w*0.72, rh = usableH*0.42;
+    strokeRoundRect(ctx, cx-rw/2, uy-rh/2, rw, rh, 28, 'rgba(11,95,255,.28)', 3);
 
-  // إطار وسط الشاشة لتوجيه المستخدم نحو الحافة
-  const rw = w * 0.68;
-  const rh = h * 0.36;
-  ctx.beginPath();
-  roundRect(ctx, cx-rw/2, cy-rh/2, rw, rh, 24);
-  ctx.stroke();
+    ctx.strokeStyle='rgba(25,195,125,.20)';
+    ctx.lineWidth=2;
+    ctx.beginPath();
+    ctx.moveTo(cx, uy-rh/2); ctx.lineTo(cx, uy+rh/2);
+    ctx.moveTo(cx-rw/2, uy); ctx.lineTo(cx+rw/2, uy);
+    ctx.stroke();
+  }
+  else if(type==='4.7'){
+    // منصة التهوية: مستطيل عريض
+    const rw = w*0.78, rh = usableH*0.30;
+    strokeRoundRect(ctx, cx-rw/2, uy-rh/2, rw, rh, 24, 'rgba(25,195,125,.85)', 4);
 
-  // خطوط إرشاد
-  ctx.strokeStyle = 'rgba(25,195,125,.18)';
-  ctx.beginPath();
-  ctx.moveTo(cx, cy-rh/2); ctx.lineTo(cx, cy+rh/2);
-  ctx.moveTo(cx-rw/2, cy); ctx.lineTo(cx+rw/2, cy);
-  ctx.stroke();
+    // زوايا داخلية تساعد المحاذاة
+    cornerMarks(ctx, cx-rw/2, uy-rh/2, rw, rh, 28, 'rgba(245,247,250,.75)');
+  }
+  else if(type==='5.8'){
+    // منصة النفايات: مستطيل أقرب للمربع (أو يمكن دائرة)
+    const s = Math.min(w*0.62, usableH*0.52);
+    strokeRoundRect(ctx, cx-s/2, uy-s/2, s, s, 26, 'rgba(245,158,11,.90)', 4);
+    cornerMarks(ctx, cx-s/2, uy-s/2, s, s, 26, 'rgba(245,247,250,.75)');
+  }
+  else {
+    // العيوب: مربع + شبكة خفيفة
+    const s = Math.min(w*0.70, usableH*0.58);
+    strokeRoundRect(ctx, cx-s/2, uy-s/2, s, s, 26, 'rgba(11,95,255,.85)', 4);
 
+    ctx.strokeStyle='rgba(11,95,255,.18)';
+    ctx.lineWidth=2;
+    for(let i=1;i<4;i++){
+      ctx.beginPath();
+      ctx.moveTo(cx-s/2 + s*i/4, uy-s/2);
+      ctx.lineTo(cx-s/2 + s*i/4, uy+s/2);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(cx-s/2, uy-s/2 + s*i/4);
+      ctx.lineTo(cx+s/2, uy-s/2 + s*i/4);
+      ctx.stroke();
+    }
+  }
   ctx.restore();
 }
 
+function strokeRoundRect(ctx, x,y,w,h,r,stroke, lw){
+  ctx.strokeStyle = stroke;
+  ctx.lineWidth = lw;
+  ctx.beginPath();
+  roundRect(ctx, x,y,w,h,r);
+  ctx.stroke();
+}
+function roundRect(ctx, x, y, w, h, r){
+  const rr = Math.min(r, w/2, h/2);
+  ctx.moveTo(x+rr, y);
+  ctx.arcTo(x+w, y, x+w, y+h, rr);
+  ctx.arcTo(x+w, y+h, x, y+h, rr);
+  ctx.arcTo(x, y+h, x, y, rr);
+  ctx.arcTo(x, y, x+w, y, rr);
+}
+function cornerMarks(ctx, x,y,w,h, len, color){
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  // TL
+  ctx.moveTo(x, y+len); ctx.lineTo(x, y); ctx.lineTo(x+len, y);
+  // TR
+  ctx.moveTo(x+w-len, y); ctx.lineTo(x+w, y); ctx.lineTo(x+w, y+len);
+  // BL
+  ctx.moveTo(x, y+h-len); ctx.lineTo(x, y+h); ctx.lineTo(x+len, y+h);
+  // BR
+  ctx.moveTo(x+w-len, y+h); ctx.lineTo(x+w, y+h); ctx.lineTo(x+w, y+h-len);
+  ctx.stroke();
+}
+
 function drawDetectedGeometry(ctx, cvRes){
-  // cvRes line coords are in "capture image space". We map them to overlay space
-  // باستخدام معاملات التحجيم بين captureCanvas و overlay
-  const overlay = ctx.canvas;
-  const map = cvRes.map; // {sx, sy}
+  const map = cvRes.map;
   if(!map) return;
 
   const toO = (pt)=> ({ x: pt.x * map.sx, y: pt.y * map.sy });
@@ -729,77 +605,35 @@ function drawDetectedGeometry(ctx, cvRes){
   ctx.shadowColor = 'rgba(0,0,0,.6)';
   ctx.shadowBlur = 10;
 
-  // الخط الأفقي (الأرض)
   ctx.strokeStyle = 'rgba(25,195,125,.95)';
   ctx.beginPath(); ctx.moveTo(h1.x,h1.y); ctx.lineTo(h2.x,h2.y); ctx.stroke();
 
-  // الخط العمودي (الجدار)
   ctx.strokeStyle = 'rgba(11,95,255,.95)';
   ctx.beginPath(); ctx.moveTo(v1.x,v1.y); ctx.lineTo(v2.x,v2.y); ctx.stroke();
 
-  // نقطة التقاطع
   ctx.fillStyle = 'rgba(245,247,250,.95)';
   ctx.beginPath(); ctx.arc(I.x, I.y, 7, 0, Math.PI*2); ctx.fill();
 
-  // مثلث (ضلع على الأرض + ضلع على الجدار + وتر بين نقطتين بعيدتين ثابتة)
-  // نختار نقطتين على كل خط على بعد ثابت من التقاطع
-  const len = Math.min(overlay.width, overlay.height) * 0.16;
-
-  const dirH = norm({x:h2.x-h1.x, y:h2.y-h1.y});
-  const dirV = norm({x:v2.x-v1.x, y:v2.y-v1.y});
-
-  const A = { x: I.x + dirH.x * len, y: I.y + dirH.y * len };
-  const B = { x: I.x + dirV.x * len, y: I.y + dirV.y * len };
-
-  ctx.lineWidth = 4;
-  ctx.strokeStyle = 'rgba(245,247,250,.85)';
-  ctx.beginPath();
-  ctx.moveTo(I.x, I.y);
-  ctx.lineTo(A.x, A.y);
-  ctx.lineTo(B.x, B.y);
-  ctx.closePath();
-  ctx.stroke();
-
-  // نص الزاوية
   ctx.shadowBlur = 0;
   ctx.fillStyle = 'rgba(245,247,250,.95)';
   ctx.font = '900 28px system-ui, Arial';
   ctx.textAlign = 'center';
   ctx.fillText(cvRes.angleDeg.toFixed(1) + '°', I.x, I.y - 16);
-
   ctx.restore();
 }
 
-function roundRect(ctx, x, y, w, h, r){
-  const rr = Math.min(r, w/2, h/2);
-  ctx.moveTo(x+rr, y);
-  ctx.arcTo(x+w, y, x+w, y+h, rr);
-  ctx.arcTo(x+w, y+h, x, y+h, rr);
-  ctx.arcTo(x, y+h, x, y, rr);
-  ctx.arcTo(x, y, x+w, y, rr);
-}
-
-/* =========================
-   Computer Vision: OpenCV Hough lines
-   ========================= */
+/* ===== OpenCV CV detect (only for 4.5) ===== */
 function ensureCVReady(){
   return new Promise((resolve, reject)=>{
     const t0 = Date.now();
-    const check = ()=>{
+    const tick = ()=>{
       if(typeof cv !== 'undefined' && cv.Mat){
-        // بعض النسخ تحتاج onRuntimeInitialized
-        if(cv.onRuntimeInitialized){
-          // إذا كان runtime جاهزاً
-          resolve(true);
-        } else {
-          resolve(true);
-        }
-        return;
+        resolve(true); return;
       }
-      if(Date.now() - t0 > 8000) return reject(new Error("OpenCV load timeout"));
-      requestAnimationFrame(check);
+      if(Date.now()-t0>8000) return reject(new Error("OpenCV timeout"));
+      requestAnimationFrame(tick);
     };
-    check();
+    tick();
   });
 }
 
@@ -807,348 +641,133 @@ function captureFrameToCanvas(){
   const video = document.getElementById('video');
   const canvas = document.getElementById('captureCanvas');
   const ctx = canvas.getContext('2d');
-
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
-  ctx.drawImage(video, 0, 0);
+  ctx.drawImage(video,0,0);
   return canvas;
 }
-
-function matFromCanvas(canvas){
-  // OpenCV read
-  return cv.imread(canvas);
+function clamp(x,a,b){ return Math.max(a, Math.min(b,x)); }
+function direction(p1,p2){
+  const dx=p2.x-p1.x, dy=p2.y-p1.y;
+  const n=Math.hypot(dx,dy)||1;
+  return {x:dx/n,y:dy/n};
+}
+function angleBetween(u,v){
+  const dot= u.x*v.x + u.y*v.y;
+  return Math.acos(clamp(dot,-1,1))*180/Math.PI;
+}
+function lineIntersection(a,b,c,d){
+  const A1=b.y-a.y, B1=a.x-b.x, C1=A1*a.x + B1*a.y;
+  const A2=d.y-c.y, B2=c.x-d.x, C2=A2*c.x + B2*c.y;
+  const det=A1*B2 - A2*B1;
+  if(Math.abs(det)<1e-6) return null;
+  return { x:(B2*C1 - B1*C2)/det, y:(A1*C2 - A2*C1)/det };
 }
 
 function detectWallFloorAngle(canvas){
-  // يرجع: {angleDeg, confidence, hLine, vLine, intersection, map}
-  // map: لتحويل نقاط canvas إلى overlay
-
-  const src = matFromCanvas(canvas);
+  const src = cv.imread(canvas);
   const w = src.cols, h = src.rows;
 
-  // Preprocess
   const gray = new cv.Mat();
   cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
 
   const blur = new cv.Mat();
-  cv.GaussianBlur(gray, blur, new cv.Size(5,5), 0, 0, cv.BORDER_DEFAULT);
+  cv.GaussianBlur(gray, blur, new cv.Size(5,5), 0);
 
   const edges = new cv.Mat();
-  // Canny thresholds يمكن تعديلها حسب البيئات
-  cv.Canny(blur, edges, 60, 160);
+  cv.Canny(blur, edges, 50, 140);
 
-  // HoughLinesP
   const lines = new cv.Mat();
-  const rho = 1;
-  const theta = Math.PI/180;
-  const threshold = 80;
-  const minLineLength = Math.min(w,h) * 0.25;
-  const maxLineGap = 15;
+  cv.HoughLinesP(edges, lines, 1, Math.PI/180, 70, Math.min(w,h)*0.25, 18);
 
-  cv.HoughLinesP(edges, lines, rho, theta, threshold, minLineLength, maxLineGap);
-
-  // استخراج المرشحين
-  const candidates = [];
-  for(let i=0; i<lines.rows; i++){
-    const x1 = lines.data32S[i*4+0];
-    const y1 = lines.data32S[i*4+1];
-    const x2 = lines.data32S[i*4+2];
-    const y2 = lines.data32S[i*4+3];
-
-    const dx = x2-x1, dy = y2-y1;
-    const len = Math.hypot(dx,dy);
-    if(len < minLineLength) continue;
-
-    // زاوية الخط بالنسبة للأفق
-    let ang = Math.atan2(dy, dx) * 180 / Math.PI; // -180..180
-    // اجعلها 0..180
-    if(ang < 0) ang += 180;
-
-    // وزن: طول + قرب من منتصف الشاشة (نعطي الأفضل للحافة في المنتصف)
-    const mx = (x1+x2)/2, my = (y1+y2)/2;
-    const centerScore = 1.0 - (Math.hypot(mx-w/2, my-h/2) / Math.hypot(w/2,h/2));
-    const score = len * (0.75 + 0.25 * Math.max(0, centerScore));
-
-    candidates.push({
-      p1:{x:x1,y:y1}, p2:{x:x2,y:y2},
-      len, ang, score
-    });
+  const candidates=[];
+  for(let i=0;i<lines.rows;i++){
+    const x1=lines.data32S[i*4+0], y1=lines.data32S[i*4+1];
+    const x2=lines.data32S[i*4+2], y2=lines.data32S[i*4+3];
+    const dx=x2-x1, dy=y2-y1;
+    const len=Math.hypot(dx,dy);
+    if(len < Math.min(w,h)*0.25) continue;
+    let ang=Math.atan2(dy,dx)*180/Math.PI;
+    if(ang<0) ang+=180;
+    const score=len;
+    candidates.push({p1:{x:x1,y:y1}, p2:{x:x2,y:y2}, len, ang, score});
   }
 
-  // مصنف: أفقي قريب من 0/180 (مثلاً <=20° أو >=160°)، عمودي قريب من 90 (مثلاً 70..110)
-  const H = candidates.filter(c => (c.ang <= 20 || c.ang >= 160)).sort((a,b)=>b.score-a.score);
-  const V = candidates.filter(c => (c.ang >= 70 && c.ang <= 110)).sort((a,b)=>b.score-a.score);
+  const H=candidates.filter(c=>c.ang<=18 || c.ang>=162).sort((a,b)=>b.score-a.score);
+  const V=candidates.filter(c=>c.ang>=72 && c.ang<=108).sort((a,b)=>b.score-a.score);
 
-  // تنظيف
   src.delete(); gray.delete(); blur.delete(); edges.delete(); lines.delete();
 
-  if(H.length === 0 || V.length === 0){
-    return null;
-  }
-
-  // الأفضل
-  const hLine = H[0];
-  const vLine = V[0];
-
-  // تقاطع الخطين (كخطين لا كقطع)
-  const inter = lineIntersection(hLine.p1, hLine.p2, vLine.p1, vLine.p2);
+  if(!H.length || !V.length) return null;
+  const hLine=H[0], vLine=V[0];
+  const inter=lineIntersection(hLine.p1,hLine.p2, vLine.p1, vLine.p2);
   if(!inter) return null;
 
-  // زاوية بين الاتجاهين (0..90)
-  const u = direction(hLine.p1, hLine.p2);
-  const v = direction(vLine.p1, vLine.p2);
-  let angle = angleBetween(u, v); // 0..180
-  angle = Math.min(angle, 180-angle); // 0..90
+  const u=direction(hLine.p1,hLine.p2);
+  const v=direction(vLine.p1,vLine.p2);
+  let angle=angleBetween(u,v);
+  angle=Math.min(angle, 180-angle);
 
-  // Confidence: يعتمد على طول الخطين وعدد الخطوط المكتشفة (تقريبي)
-  const strength = (hLine.len + vLine.len) / (Math.min(w,h) * 1.2);
-  const density = Math.min(1, candidates.length / 40);
-  const confidence = clamp(0.35 + 0.45*clamp(strength,0,1) + 0.20*density, 0, 0.98);
+  const conf=clamp(0.45 + 0.35*((hLine.len+vLine.len)/(Math.min(w,h)*1.2)) + 0.15*clamp(candidates.length/40,0,1), 0, 0.98);
 
-  return {
-    angleDeg: angle,
-    confidence,
-    hLine: { p1:hLine.p1, p2:hLine.p2, ang:hLine.ang, len:hLine.len },
-    vLine: { p1:vLine.p1, p2:vLine.p2, ang:vLine.ang, len:vLine.len },
+  return { angleDeg: angle, confidence: conf,
+    hLine:{p1:hLine.p1,p2:hLine.p2,len:hLine.len,ang:hLine.ang},
+    vLine:{p1:vLine.p1,p2:vLine.p2,len:vLine.len,ang:vLine.ang},
     intersection: inter,
     rawCount: candidates.length
   };
 }
 
-function clamp(x,a,b){ return Math.max(a, Math.min(b, x)); }
-
-function direction(p1,p2){
-  const dx = p2.x-p1.x, dy = p2.y-p1.y;
-  const n = Math.hypot(dx,dy) || 1;
-  return { x: dx/n, y: dy/n };
-}
-
-function angleBetween(u,v){
-  const dot = u.x*v.x + u.y*v.y;
-  const d = clamp(dot, -1, 1);
-  return Math.acos(d) * 180 / Math.PI;
-}
-
-function lineIntersection(a,b,c,d){
-  // تقاطع خط AB مع CD
-  const A1 = b.y - a.y;
-  const B1 = a.x - b.x;
-  const C1 = A1*a.x + B1*a.y;
-
-  const A2 = d.y - c.y;
-  const B2 = c.x - d.x;
-  const C2 = A2*c.x + B2*c.y;
-
-  const det = A1*B2 - A2*B1;
-  if(Math.abs(det) < 1e-6) return null;
-
-  const x = (B2*C1 - B1*C2) / det;
-  const y = (A1*C2 - A2*C1) / det;
-  return { x, y };
-}
-
-function norm(v){
-  const n = Math.hypot(v.x,v.y) || 1;
-  return { x:v.x/n, y:v.y/n };
-}
-
-/* =========================
-   Rule evaluation (Rule 4.5 -> check ~45°)
-   ========================= */
-function evaluateRule(angleDeg, confidence){
-  const L = TT[currentLang];
-
-  // افتراض عملي: القاعدة 4.5 = زاوية مطلوبة 45°
-  if(selectedType === '4.5'){
-    const target = 45;
-    const tol = 3.0; // يمكنك تعديلها حسب السياسة
-    const diff = Math.abs(angleDeg - target);
-
-    // نجعل الحكم مرتبط بالثقة أيضاً
-    if(confidence < 0.55){
-      return {
-        status:'uncertain',
-        confidence,
-        message: (currentLang==='ar')
-          ? `تم حساب زاوية تقريبية ${angleDeg.toFixed(1)}° لكن الثقة منخفضة. قرّب الكاميرا وحسّن الإضاءة.`
-          : `Angle ~${angleDeg.toFixed(1)}° but confidence is low. Move closer and improve lighting.`
-      };
-    }
-    if(diff <= tol){
-      return {
-        status:'compliant',
-        confidence,
-        message: (currentLang==='ar')
-          ? `✅ ${L.rule45}: الزاوية ${angleDeg.toFixed(1)}° ضمن السماحية (±${tol}°).`
-          : `✅ ${L.rule45}: angle ${angleDeg.toFixed(1)}° within tolerance (±${tol}°).`
-      };
-    }
-    return {
-      status:'non-compliant',
-      confidence,
-      message: (currentLang==='ar')
-        ? `✕ ${L.rule45}: الزاوية ${angleDeg.toFixed(1)}° خارج السماحية (±${tol}°).`
-        : `✕ ${L.rule45}: angle ${angleDeg.toFixed(1)}° outside tolerance (±${tol}°).`
-    };
-  }
-
-  // لباقي الأنواع (4.7/5.8/defects): نعرض زاوية فقط كمعلومة + تصنيف "غير مؤكد"
-  return {
-    status:'uncertain',
-    confidence,
-    message: (currentLang==='ar')
-      ? `تم استخراج زاوية تقاطع تقريبية: ${angleDeg.toFixed(1)}°. هذا الفحص مخصص حالياً لزوايا 45° فقط.`
-      : `Detected intersection angle: ${angleDeg.toFixed(1)}°. This CV check is currently optimized for 45° only.`
-  };
-}
-
-/* =========================
-   Capture + Analyze
-   ========================= */
-async function captureAndAnalyze(){
+/* ===== Actions ===== */
+document.getElementById('captureBtn').addEventListener('click', async ()=>{
   const btn = document.getElementById('captureBtn');
-  const L = TT[currentLang];
-
   btn.classList.add('processing');
-  setCVState('working');
-  lastCV = null;
+  lastCV=null;
 
   try{
-    await ensureCVReady();
-
-    const canvas = captureFrameToCanvas();
-
-    // صورة للمعاينة
-    lastBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.86));
-    const url = URL.createObjectURL(lastBlob);
-    document.getElementById('preview').src = url;
-
-    openModalLoading();
-
-    // CV detect
-    const result = detectWallFloorAngle(canvas);
-
-    // تجهيز mapping إلى overlay
-    if(result){
-      const overlay = document.getElementById('overlay');
-      const sx = overlay.width / canvas.width;
-      const sy = overlay.height / canvas.height;
-      result.map = { sx, sy };
-    }
-
-    if(!result){
-      setCVState('fail');
-      // UI result
-      const resUI = {
-        status:'uncertain',
-        confidence: 0.35,
-        message: (currentLang==='ar')
-          ? 'لم ننجح في اكتشاف خطين واضحين. قرّب الكاميرا على الحافة وزد الإضاءة، ثم أعد المحاولة.'
-          : 'Could not detect two clear lines. Move closer to the edge and improve lighting, then retry.'
-      };
-      showResultUI(resUI);
-      lastCV = null;
+    // For non-45 types: just capture (no CV for now) + show toast
+    if(selectedType !== '4.5'){
+      setCVState('ready');
+      toast(currentLang==='ar'
+        ? 'تم الالتقاط — منصة التوجيه ظاهرة لهذا النوع'
+        : 'Captured — guidance frame shown for this type');
       btn.classList.remove('processing');
       return;
     }
 
-    // save + show
-    lastCV = result;
-    setCVState('ok', result);
+    setCVState('working');
+    await ensureCVReady();
 
-    const resUI = evaluateRule(result.angleDeg, result.confidence);
-    showResultUI(resUI);
+    const canvas = captureFrameToCanvas();
+    const result = detectWallFloorAngle(canvas);
 
-    // إرسال بريد تلقائياً بعد كل فحص
-    try{
-      await sendResultEmail({
-        ...resUI,
-        angleDeg: result.angleDeg,
-        rawCount: result.rawCount
-      });
-      toast(L.emailSent);
-    }catch(err){
-      console.error(err);
-      toast(L.emailFail);
+    if(result){
+      const overlay = document.getElementById('overlay');
+      result.map = { sx: overlay.width / canvas.width, sy: overlay.height / canvas.height };
+      lastCV = result;
+      setCVState('ok', result);
+    }else{
+      setCVState('fail');
     }
 
   }catch(e){
     console.error(e);
     setCVState('fail');
-    toast(L.captureFail);
   }finally{
     btn.classList.remove('processing');
   }
-}
-
-/* =========================
-   EmailJS send
-   ========================= */
-async function sendResultEmail(uiRes){
-  const L = TT[currentLang];
-
-  if(!lastBlob || !uiRes){
-    throw new Error(L.needCV);
-  }
-
-  if(!EMAILJS_PUBLIC_KEY || EMAILJS_PUBLIC_KEY.includes("PUT_") ||
-     !EMAILJS_SERVICE_ID || EMAILJS_SERVICE_ID.includes("PUT_") ||
-     !EMAILJS_TEMPLATE_ID || EMAILJS_TEMPLATE_ID.includes("PUT_")){
-    throw new Error("EmailJS keys not set");
-  }
-
-  const ts = new Date();
-
-  const payload = {
-    to_email: EMAIL_TO,
-    rule: L.rule(selectedType),
-    rule_code: selectedType,
-    status: uiRes.status,
-    confidence: (uiRes.confidence*100).toFixed(0) + '%',
-    message: uiRes.message,
-    angle_deg: (typeof uiRes.angleDeg === 'number') ? uiRes.angleDeg.toFixed(2) : 'N/A',
-    cv_lines_count: (typeof uiRes.rawCount === 'number') ? String(uiRes.rawCount) : 'N/A',
-    timestamp: ts.toLocaleString(),
-    lang: currentLang.toUpperCase()
-  };
-
-  return emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, payload);
-}
-
-/* =========================
-   Events
-   ========================= */
-document.getElementById('captureBtn').addEventListener('click', captureAndAnalyze);
-
-document.getElementById('retryBtn').addEventListener('click', async ()=>{
-  // إعادة التحليل باستخدام لقطة جديدة مباشرة (أفضل)
-  await captureAndAnalyze();
-});
-
-document.getElementById('newBtn').addEventListener('click', ()=>{
-  closeModal();
-});
-
-document.getElementById('modalClose').addEventListener('click', closeModal);
-
-document.getElementById('stopBtn').addEventListener('click', ()=>{
-  stopOverlayLoop();
-  stopCamera();
-  lastCV = null;
-  document.getElementById('stage').style.display = 'none';
-  document.getElementById('perm').style.display = 'flex';
-  setCVState('ready');
-  toast(currentLang==='ar' ? 'تم إيقاف الكاميرا.' : 'Camera stopped.');
 });
 
 document.getElementById('switchBtn').addEventListener('click', async ()=>{
-  facingMode = (facingMode === 'environment') ? 'user' : 'environment';
-  toast(currentLang==='ar'
-    ? (facingMode==='environment' ? 'الكاميرا الخلفية' : 'الكاميرا الأمامية')
-    : (facingMode==='environment' ? 'Rear camera' : 'Front camera')
-  );
-  lastCV = null;
+  facingMode = (facingMode==='environment') ? 'user' : 'environment';
+  lastCV=null;
   await startCamera();
+});
+
+document.getElementById('stopBtn').addEventListener('click', ()=>{
+  stopCamera();
+  document.getElementById('stage').style.display='none';
+  document.getElementById('perm').style.display='flex';
 });
 
 document.getElementById('langBtn').addEventListener('click', ()=>{
@@ -1157,26 +776,18 @@ document.getElementById('langBtn').addEventListener('click', ()=>{
 });
 
 document.getElementById('types').addEventListener('click', (e)=>{
-  const btn = e.target.closest('.chip');
-  if(!btn) return;
-  selectedType = btn.dataset.type;
-  document.querySelectorAll('.chip').forEach(b=>{
-    b.classList.toggle('active', b.dataset.type===selectedType);
-  });
-  setTexts();
-  lastCV = null; // لا نعرض هندسة قديمة على نوع جديد
+  const b = e.target.closest('.chip');
+  if(!b) return;
+  selectedType = b.dataset.type;
+  document.querySelectorAll('.chip').forEach(x=> x.classList.toggle('active', x.dataset.type===selectedType));
+  lastCV=null;
+  updateHint();
+  setCVState('ready');
 });
 
-window.addEventListener('resize', ()=>{
-  resizeOverlay();
-});
-
-/* =========================
-   Init
-   ========================= */
+/* ===== Init ===== */
 setTexts();
-
-// تنبيه: OpenCV قد يتأخر بالتحميل، لا مشكلة — التحليل ينتظر ensureCVReady()
 </script>
+
 </body>
 </html>
