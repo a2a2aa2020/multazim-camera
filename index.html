@@ -11,22 +11,17 @@
       --surface: rgba(20,24,28,.72);
       --text:#F5F7FA;
       --muted: rgba(245,247,250,.72);
-
       --primary:#0B5FFF;
       --accent:#19C37D;
       --warning:#F59E0B;
       --danger:#EF4444;
-
       --radius-xl:22px;
       --radius-lg:16px;
-
       --shadow: 0 18px 60px rgba(0,0,0,.55);
       --hairline: rgba(255,255,255,.12);
-
       --safe-top: env(safe-area-inset-top);
       --safe-bottom: env(safe-area-inset-bottom);
     }
-
     *{box-sizing:border-box;margin:0;padding:0;}
     body{
       font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
@@ -35,36 +30,17 @@
       height:100vh;
       overflow:hidden;
     }
-
-    .stage{
-      position:relative;
-      width:100vw;
-      height:100vh;
-      background:#000;
-    }
-
-    #video{
-      position:absolute; inset:0;
-      width:100%; height:100%;
-      object-fit:cover;
-    }
-
+    .stage{position:relative;width:100vw;height:100vh;background:#000;}
+    #video{position:absolute; inset:0;width:100%;height:100%;object-fit:cover;}
     #captureCanvas{display:none;}
-    #overlay{
-      position:absolute; inset:0;
-      width:100%; height:100%;
-      pointer-events:none;
-    }
-
+    #overlay{position:absolute; inset:0;width:100%;height:100%;pointer-events:none;}
     .topbar{
       position:absolute; top:0; left:0; right:0;
       padding: calc(14px + var(--safe-top)) 16px 12px;
-      display:flex; align-items:center; justify-content:space-between;
-      gap:12px;
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
       z-index:10;
       background: linear-gradient(180deg, rgba(0,0,0,.75) 0%, rgba(0,0,0,0) 100%);
     }
-
     .brand{display:flex; align-items:center; gap:10px; min-width:0;}
     .logo{
       width:34px;height:34px;border-radius:10px;
@@ -76,7 +52,6 @@
     .titleWrap{display:flex; flex-direction:column; min-width:0;}
     .title{font-size:15px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .subtitle{font-size:12px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-
     .topActions{display:flex; align-items:center; gap:10px;}
     .iconBtn{
       border:1px solid var(--hairline);
@@ -92,7 +67,6 @@
       font-size:13px;
     }
     .iconBtn:active{transform:scale(.98);}
-
     .hint{
       position:absolute;
       top: calc(82px + var(--safe-top));
@@ -109,8 +83,7 @@
       text-align:center;
       font-size:14px;
     }
-
-    .levelPill{
+    .cvPill{
       position:absolute;
       top: calc(128px + var(--safe-top));
       left:50%; transform: translateX(-50%);
@@ -130,16 +103,14 @@
       box-shadow: 0 10px 35px rgba(0,0,0,.45);
       max-width:92vw;
     }
-    .levelDot{width:10px;height:10px;border-radius:999px;background: var(--warning);}
-    .levelVals{color: var(--muted); font-weight:800;}
-
+    .cvDot{width:10px;height:10px;border-radius:999px;background: var(--warning);}
+    .cvVals{color: var(--muted); font-weight:800;}
     .sheet{
       position:absolute; left:0; right:0; bottom:0;
       padding:10px 14px calc(14px + var(--safe-bottom));
       z-index:10;
       background: linear-gradient(0deg, rgba(0,0,0,.92) 0%, rgba(0,0,0,0) 100%);
     }
-
     .sheetCard{
       border: 1px solid var(--hairline);
       background: rgba(20,24,28,.56);
@@ -149,15 +120,11 @@
       padding: 12px;
       box-shadow: var(--shadow);
     }
-
     .types{
-      display:flex; gap:10px;
-      overflow-x:auto;
-      padding: 6px 4px 10px;
+      display:flex; gap:10px; overflow-x:auto; padding: 6px 4px 10px;
       scrollbar-width:none;
     }
     .types::-webkit-scrollbar{display:none;}
-
     .chip{
       border: 1px solid var(--hairline);
       background: rgba(255,255,255,.06);
@@ -177,13 +144,13 @@
       box-shadow: 0 12px 30px rgba(11,95,255,.14);
     }
     .chip:active{transform:scale(.98);}
-
     .captureRow{
-      display:flex; align-items:center; justify-content:space-between;
+      display:grid;
+      grid-template-columns: 46px 1fr 46px;
       gap:12px;
       padding: 6px 4px 2px;
+      align-items:center;
     }
-
     .miniBtn{
       width:46px;height:46px;border-radius:16px;
       border:1px solid var(--hairline);
@@ -194,21 +161,23 @@
       font-size:18px;
     }
     .miniBtn:active{transform:scale(.98);}
-
     .capture{
-      width:78px;height:78px;border-radius:999px;
-      border:3px solid rgba(255,255,255,.92);
-      background:
-        radial-gradient(circle at 30% 30%, rgba(255,255,255,.18), rgba(255,255,255,0)),
-        linear-gradient(135deg, rgba(11,95,255,.92), rgba(25,195,125,.92));
+      width:100%;
+      height:50px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.18);
+      background: linear-gradient(135deg, rgba(11,95,255,.92), rgba(25,195,125,.92));
+      color:#fff;
       box-shadow: 0 18px 45px rgba(0,0,0,.55);
       cursor:pointer;
       display:flex; align-items:center; justify-content:center;
-      font-size:26px;
+      font-size:15px;
+      font-weight:900;
       transition: opacity .2s ease;
+      gap:10px;
     }
     .capture.processing{opacity:.65;pointer-events:none;filter: grayscale(.35);}
-    .capture:active{transform:scale(.98);}
+    .capture:active{transform:scale(.99);}
 
     .perm{
       position:fixed; inset:0;
@@ -233,7 +202,6 @@
     }
     .permCard h2{font-size:18px;margin-top:12px;}
     .permCard p{color: var(--muted); margin-top:10px; line-height:1.7; font-size:14px;}
-
     .primaryBtn{
       margin-top:16px;
       width:100%;
@@ -257,7 +225,6 @@
       padding: calc(14px + var(--safe-top)) 14px calc(14px + var(--safe-bottom));
     }
     .modal.active{display:flex;flex-direction:column;gap:12px;}
-
     .modalHeader{
       display:flex;align-items:center;justify-content:space-between;
       padding:12px 14px;
@@ -276,7 +243,6 @@
       border-radius:14px;
       cursor:pointer;
     }
-
     .modalBody{
       flex:1;
       overflow:auto;
@@ -287,7 +253,6 @@
       -webkit-backdrop-filter: blur(12px);
       padding:14px;
     }
-
     .preview{
       width:100%;
       border-radius:18px;
@@ -295,14 +260,12 @@
       margin-bottom:14px;
       display:block;
     }
-
     .card{
       border-radius:18px;
       border:1px solid var(--hairline);
       background: rgba(255,255,255,.06);
       padding:14px;
     }
-
     .statusRow{display:flex;align-items:center;justify-content:space-between;gap:10px;}
     .badge{
       padding:8px 12px;
@@ -315,16 +278,13 @@
     .badge.ok{background: rgba(25,195,125,.14); border-color: rgba(25,195,125,.45);}
     .badge.no{background: rgba(239,68,68,.14); border-color: rgba(239,68,68,.45);}
     .badge.maybe{background: rgba(245,158,11,.14); border-color: rgba(245,158,11,.45);}
-
     .meta{color:var(--muted);font-size:13px;margin-top:10px;}
     .bar{
       height:10px;border-radius:999px;background: rgba(255,255,255,.10);
       margin-top:10px;overflow:hidden;border:1px solid var(--hairline);
     }
     .fill{height:100%;width:0%;transition:width 600ms ease;}
-
     .msg{margin-top:12px;color: rgba(245,247,250,.9);line-height:1.7;font-size:14px;}
-
     .actions{
       display:grid;
       grid-template-columns:1fr 1fr;
@@ -340,7 +300,6 @@
       font-weight:900;
       cursor:pointer;
     }
-
     .toast{
       position:fixed;
       left:50%;
@@ -363,28 +322,30 @@
     .toast.show{display:block;}
   </style>
 
-  <!-- EmailJS (للتجربة الآن) -->
+  <!-- EmailJS (للتجربة) -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+  <!-- OpenCV.js (Computer Vision) -->
+  <script async src="https://docs.opencv.org/4.x/opencv.js"></script>
 </head>
 
 <body>
 
-  <!-- Permission -->
   <div id="perm" class="perm">
     <div class="permCard">
       <div style="font-size:64px">📷</div>
-      <h2 id="permTitle">الوصول للكاميرا والحساسات مطلوب</h2>
+      <h2 id="permTitle">الوصول للكاميرا مطلوب</h2>
       <p id="permDesc">
-        يستخدم التطبيق الكاميرا للفحص، ويستخدم حساسات الحركة (الجاذبية) لضبط استواء الهاتف قبل الالتقاط.
+        سيقوم التطبيق بالتقاط صورة ثم اكتشاف خط الأرض وخط الجدار تلقائيًا (Computer Vision)
+        وحساب زاوية التقاطع بينهما.
       </p>
       <button class="primaryBtn" id="permBtn">السماح والبدء</button>
       <p style="margin-top:12px; font-size:12px; color: var(--muted);">
-        ستُطلب أذونات الحساسات على iPhone عند الحاجة.
+        ملاحظة: اكتشاف الخطوط يحتاج تباين واضح (حافة الجدار/الأرض + إضاءة كافية).
       </p>
     </div>
   </div>
 
-  <!-- Stage -->
   <div class="stage" id="stage" style="display:none;">
     <video id="video" autoplay playsinline muted></video>
     <canvas id="captureCanvas"></canvas>
@@ -395,7 +356,7 @@
         <div class="logo">م</div>
         <div class="titleWrap">
           <div class="title" id="appTitle">ملتزم — كاميرا الفحص</div>
-          <div class="subtitle" id="appSub">خدمة فحص ميداني — نسخة تجريبية</div>
+          <div class="subtitle" id="appSub">فحص زاوية الجدار/الأرض — Computer Vision</div>
         </div>
       </div>
       <div class="topActions">
@@ -403,13 +364,12 @@
       </div>
     </div>
 
-    <div class="hint" id="hint">وجّه الكاميرا نحو المنطقة المراد فحصها</div>
+    <div class="hint" id="hint">وجّه الكاميرا نحو زاوية التقاء الجدار بالأرض (الحافة في منتصف الشاشة)</div>
 
-    <!-- Level indicator -->
-    <div id="levelPill" class="levelPill">
-      <span id="levelDot" class="levelDot"></span>
-      <span id="levelText">ثبّت الهاتف ليصبح مستويًا (±2°)</span>
-      <span id="levelVals" class="levelVals"></span>
+    <div class="cvPill" id="cvPill">
+      <span id="cvDot" class="cvDot"></span>
+      <span id="cvText">جاهز — اضغط “التقاط + تحليل”</span>
+      <span id="cvVals" class="cvVals"></span>
     </div>
 
     <div class="sheet">
@@ -423,14 +383,15 @@
 
         <div class="captureRow">
           <button class="miniBtn" id="switchBtn" title="تبديل الكاميرا">🔄</button>
-          <button class="capture" id="captureBtn" title="التقاط">📷</button>
+          <button class="capture" id="captureBtn" title="التقاط وتحليل">
+            📷 <span id="capLabel">التقاط + تحليل</span>
+          </button>
           <button class="miniBtn" id="stopBtn" title="إيقاف الكاميرا">⏻</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Modal -->
   <div class="modal" id="modal">
     <div class="modalHeader">
       <strong id="modalTitle">نتيجة الفحص</strong>
@@ -449,7 +410,7 @@
         </div>
 
         <div class="bar"><div class="fill" id="fill"></div></div>
-        <div class="msg" id="msg">يتم الآن معالجة الصورة…</div>
+        <div class="msg" id="msg">يتم الآن استخراج الخطوط وحساب الزاوية…</div>
 
         <div class="actions">
           <button class="ghost" id="retryBtn">إعادة التحليل</button>
@@ -462,685 +423,760 @@
   <div class="toast" id="toast"></div>
 
 <script>
-  // ===========================
-  //  EmailJS إعدادات (عدّلها)
-  // ===========================
-  const EMAILJS_PUBLIC_KEY  = "PUT_YOUR_PUBLIC_KEY_HERE";
-  const EMAILJS_SERVICE_ID  = "PUT_YOUR_SERVICE_ID_HERE";
-  const EMAILJS_TEMPLATE_ID = "PUT_YOUR_TEMPLATE_ID_HERE";
-  const EMAIL_TO = "a.alamm@datainsight.com.sa";
+/* =========================
+   EmailJS إعدادات (عدّلها)
+   ========================= */
+const EMAILJS_PUBLIC_KEY  = "PUT_YOUR_PUBLIC_KEY_HERE";
+const EMAILJS_SERVICE_ID  = "PUT_YOUR_SERVICE_ID_HERE";
+const EMAILJS_TEMPLATE_ID = "PUT_YOUR_TEMPLATE_ID_HERE";
+const EMAIL_TO = "a.alamm@datainsight.com.sa";
+emailjs.init(EMAILJS_PUBLIC_KEY);
 
-  // تهيئة EmailJS
-  emailjs.init(EMAILJS_PUBLIC_KEY);
+/* =========================
+   State
+   ========================= */
+let stream = null;
+let currentLang = 'ar';
+let selectedType = '4.5';
+let facingMode = 'environment';
+let lastBlob = null;
 
-  // ===========================
-  //  State
-  // ===========================
-  let stream = null;
-  let currentLang = 'ar';
-  let selectedType = '4.5';
-  let facingMode = 'environment';
-  let lastBlob = null;
+// آخر نتيجة CV
+let lastCV = null; // { angleDeg, confidence, hLine, vLine, intersection, status }
 
-  // ===========================
-  //  Level / Sensors (آخر اقتراح: DeviceMotion + Gravity + Compensation + Smoothing + Stability)
-  // ===========================
-  // السماح بالالتقاط عند ميل صغير + ثبات لزمن قصير
-  const LEVEL_TOL_DEG = 2;         // ±2° (شرط الاستواء)
-  const STABILITY_TOL_DEG = 0.35;  // مقدار التذبذب المسموح خلال نافذة الاستقرار (±0.35° تقريباً)
-  const STABILITY_MS = 450;        // لازم يبقى مستوياً وثابتاً 450ms
-  const SMOOTH_ALPHA = 0.18;       // معامل التنعيم (0..1) أصغر = أنعم/أبطأ
-
-  let isLevel = false;
-  let isStable = false;
-
-  // القيم الخام/المفلترة
-  let lastPitchRaw = null, lastRollRaw = null;
-  let pitchFiltered = null, rollFiltered = null;
-
-  // نافذة للثبات
-  let stableSince = null;
-  let windowSamples = []; // {t, p, r}
-  const MAX_WINDOW_MS = 650;
-
-  // طلب إذن الحساسات على iOS (DeviceMotion)
-  async function requestMotionPermissionIfNeeded(){
-    try{
-      if(typeof DeviceMotionEvent !== 'undefined' &&
-         typeof DeviceMotionEvent.requestPermission === 'function'){
-        const res = await DeviceMotionEvent.requestPermission();
-        return res === 'granted';
-      }
-      return true;
-    }catch(e){
-      console.error(e);
-      return false;
-    }
+/* =========================
+   Translations
+   ========================= */
+const TT = {
+  ar: {
+    appTitle: 'ملتزم — كاميرا الفحص',
+    appSub: 'فحص زاوية الجدار/الأرض — Computer Vision',
+    hint: 'وجّه الكاميرا نحو زاوية التقاء الجدار بالأرض (الحافة في منتصف الشاشة)',
+    cap: 'التقاط + تحليل',
+    modalTitle: 'نتيجة الفحص',
+    retry: 'إعادة التحليل',
+    newScan: 'فحص جديد',
+    close: 'إغلاق ✕',
+    lang: 'EN',
+    rule: (x)=> x==='defects' ? 'فحص العيوب' : `القاعدة ${x}`,
+    ready: 'جاهز — اضغط “التقاط + تحليل”',
+    cvWorking: 'جاري اكتشاف الخطوط…',
+    cvOk: (a)=> `تم اكتشاف الزاوية: ${a.toFixed(1)}°`,
+    cvFail: 'لم ننجح في اكتشاف خطين واضحين. قرّب الكاميرا على الحافة وزد الإضاءة.',
+    emailSent: 'تم إرسال النتيجة بالبريد ✅',
+    emailFail: 'تعذر إرسال البريد. تأكد من إعداد EmailJS.',
+    cameraFail: 'فشل تشغيل الكاميرا. تأكد من منح الإذن.',
+    captureFail: 'فشل التقاط/تحليل الصورة.',
+    needCV: 'لا يوجد نتيجة تحليل لإرسالها.',
+    rule45: 'التحقق من زاوية 45°',
+    compliant: 'مطابق',
+    noncompliant: 'غير مطابق',
+    uncertain: 'غير مؤكد'
+  },
+  en: {
+    appTitle: 'Multazim — Inspection Camera',
+    appSub: 'Wall/Floor Angle — Computer Vision',
+    hint: 'Point the camera at the wall/floor edge (keep the edge centered)',
+    cap: 'Capture + Analyze',
+    modalTitle: 'Inspection Result',
+    retry: 'Retry',
+    newScan: 'New Scan',
+    close: 'Close ✕',
+    lang: 'AR',
+    rule: (x)=> x==='defects' ? 'Defects Scan' : `Rule ${x}`,
+    ready: 'Ready — tap “Capture + Analyze”',
+    cvWorking: 'Detecting lines…',
+    cvOk: (a)=> `Angle detected: ${a.toFixed(1)}°`,
+    cvFail: 'Could not find two clear lines. Move closer to the edge and improve lighting.',
+    emailSent: 'Result emailed ✅',
+    emailFail: 'Email failed. Check EmailJS setup.',
+    cameraFail: 'Unable to start camera. Please grant permission.',
+    captureFail: 'Capture/analyze failed.',
+    needCV: 'No analysis result available.',
+    rule45: 'Validate 45° angle',
+    compliant: 'Compliant',
+    noncompliant: 'Non-Compliant',
+    uncertain: 'Uncertain'
   }
+};
 
-  // قراءة زاوية الشاشة (للتعويض عن تدوير الجهاز)
-  function getScreenAngle(){
-    // 0 / 90 / 180 / 270
-    const so = (screen.orientation && typeof screen.orientation.angle === 'number')
-      ? screen.orientation.angle
-      : (typeof window.orientation === 'number' ? window.orientation : 0);
-    // normalize to 0..359
-    return ((so % 360) + 360) % 360;
+/* =========================
+   UI helpers
+   ========================= */
+function toast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(()=> el.classList.remove('show'), 2500);
+}
+
+function setTexts(){
+  const L = TT[currentLang];
+  document.documentElement.lang = currentLang;
+  document.documentElement.dir  = currentLang==='ar' ? 'rtl' : 'ltr';
+
+  document.getElementById('appTitle').textContent = L.appTitle;
+  document.getElementById('appSub').textContent   = L.appSub;
+  document.getElementById('hint').textContent     = L.hint;
+  document.getElementById('modalTitle').textContent = L.modalTitle;
+  document.getElementById('retryBtn').textContent = L.retry;
+  document.getElementById('newBtn').textContent   = L.newScan;
+  document.getElementById('modalClose').textContent = L.close;
+  document.getElementById('langLabel').textContent  = L.lang;
+  document.getElementById('capLabel').textContent   = L.cap;
+  document.getElementById('ruleLabel').textContent  = L.rule(selectedType);
+
+  // الحالة
+  setCVState('ready');
+}
+
+function setCVState(state, payload){
+  const L = TT[currentLang];
+  const dot = document.getElementById('cvDot');
+  const txt = document.getElementById('cvText');
+  const vals = document.getElementById('cvVals');
+
+  if(state === 'ready'){
+    dot.style.background = 'var(--warning)';
+    txt.textContent = L.ready;
+    vals.textContent = '';
+  } else if(state === 'working'){
+    dot.style.background = 'var(--warning)';
+    txt.textContent = L.cvWorking;
+    vals.textContent = '';
+  } else if(state === 'ok'){
+    dot.style.background = 'var(--accent)';
+    txt.textContent = L.cvOk(payload.angleDeg);
+    vals.textContent = (currentLang==='ar')
+      ? `ثقة: ${(payload.confidence*100).toFixed(0)}%`
+      : `Conf: ${(payload.confidence*100).toFixed(0)}%`;
+  } else if(state === 'fail'){
+    dot.style.background = 'var(--danger)';
+    txt.textContent = L.cvFail;
+    vals.textContent = '';
   }
+}
 
-  // تعويض المحاور حسب زاوية الشاشة
-  function compensateForScreenAngle(pitch, roll){
-    // pitch/roll هنا محسوبة بالنسبة لمحاور الجهاز في وضع portrait الافتراضي.
-    // عند تدوير الشاشة، نحول (pitch, roll) للعرض الصحيح.
-    const ang = getScreenAngle();
-    let p = pitch, r = roll;
+function openModalLoading(){
+  const L = TT[currentLang];
+  document.getElementById('modal').classList.add('active');
+  document.getElementById('badge').className = 'badge maybe';
+  document.getElementById('badge').textContent = currentLang==='ar' ? '⏳ جاري التحليل' : '⏳ Analyzing';
+  document.getElementById('confText').textContent = currentLang==='ar' ? 'مستوى الثقة: —' : 'Confidence: —';
+  document.getElementById('fill').style.width = '0%';
+  document.getElementById('fill').style.background = 'linear-gradient(90deg, rgba(245,158,11,.9), rgba(11,95,255,.9))';
+  document.getElementById('msg').textContent = currentLang==='ar'
+    ? 'يتم الآن استخراج الخطوط وحساب الزاوية…'
+    : 'Extracting lines and computing angle…';
+  document.getElementById('ruleLabel').textContent = L.rule(selectedType);
+}
 
-    // ملاحظة: التعويضات ليست “فيزياء كاملة” لكنها عملية جداً للحالة الواقعية
-    // 0: portrait
-    // 90: landscape-right
-    // 180: portrait-upside-down
-    // 270: landscape-left
-    if(ang === 90){
-      // تبادل مع إشارات
-      const tmp = p;
-      p = -r;
-      r = tmp;
-    } else if(ang === 180){
-      p = -p;
-      r = -r;
-    } else if(ang === 270){
-      const tmp = p;
-      p = r;
-      r = -tmp;
-    }
-    return { pitch:p, roll:r, angle: ang };
-  }
+function closeModal(){
+  document.getElementById('modal').classList.remove('active');
+  const img = document.getElementById('preview');
+  if(img.src.startsWith('blob:')) URL.revokeObjectURL(img.src);
+  img.src = '';
+}
 
-  // حساب pitch/roll من متجه الجاذبية
-  function computePitchRollFromGravity(ax, ay, az){
-    // ax, ay, az من accelerationIncludingGravity (m/s^2 تقريباً)
-    // pitch: ميل للأمام/الخلف
-    // roll: ميل لليمين/اليسار
-    // صيغ شائعة لميزان الماء (تعمل جيداً لمعظم الأجهزة)
-    const roll  = Math.atan2(ay, az) * 180 / Math.PI;
-    const pitch = Math.atan2(-ax, Math.sqrt(ay*ay + az*az)) * 180 / Math.PI;
-    return { pitch, roll };
-  }
+function showResultUI(res){
+  const fill = document.getElementById('fill');
+  const badge = document.getElementById('badge');
+  const confText = document.getElementById('confText');
+  const msg = document.getElementById('msg');
 
-  // تنعيم Exponential Moving Average
-  function smooth(value, prev){
-    if(prev === null || prev === undefined) return value;
-    return prev + SMOOTH_ALPHA * (value - prev);
-  }
-
-  function updateStability(now, p, r){
-    // أضف عينة
-    windowSamples.push({ t: now, p, r });
-
-    // احذف القديم
-    const cutoff = now - MAX_WINDOW_MS;
-    while(windowSamples.length && windowSamples[0].t < cutoff){
-      windowSamples.shift();
-    }
-
-    // احسب التذبذب في النافذة (peak-to-peak)
-    let pMin = Infinity, pMax = -Infinity, rMin = Infinity, rMax = -Infinity;
-    for(const s of windowSamples){
-      if(s.p < pMin) pMin = s.p;
-      if(s.p > pMax) pMax = s.p;
-      if(s.r < rMin) rMin = s.r;
-      if(s.r > rMax) rMax = s.r;
-    }
-    const pRange = (pMax - pMin);
-    const rRange = (rMax - rMin);
-
-    // هل مستقر؟
-    const stableWindow = (pRange <= STABILITY_TOL_DEG) && (rRange <= STABILITY_TOL_DEG);
-    return { stableWindow, pRange, rRange };
-  }
-
-  function setLevelState(pitchDeg, rollDeg, meta){
-    // شروط الاستواء
-    isLevel = (Math.abs(pitchDeg) <= LEVEL_TOL_DEG) && (Math.abs(rollDeg) <= LEVEL_TOL_DEG);
-
-    // شروط الثبات (مع نافذة زمنية)
-    const now = performance.now();
-    const { stableWindow, pRange, rRange } = updateStability(now, pitchDeg, rollDeg);
-
-    // نعتبر “مستقر” إذا مستوي + نافذة مستقرة لمدة STABILITY_MS
-    if(isLevel && stableWindow){
-      if(stableSince === null) stableSince = now;
-      isStable = (now - stableSince) >= STABILITY_MS;
-    } else {
-      stableSince = null;
-      isStable = false;
-    }
-
-    // تحديث الواجهة
-    updateLevelUI(pitchDeg, rollDeg, {
-      ...meta,
-      pRange, rRange,
-      stableWindow
-    });
-  }
-
-  function updateLevelUI(pitchDeg, rollDeg, meta){
-    const dot = document.getElementById('levelDot');
-    const text = document.getElementById('levelText');
-    const vals = document.getElementById('levelVals');
-    const L = TT[currentLang];
-
-    const p = Math.round(pitchDeg * 10) / 10;
-    const r = Math.round(rollDeg * 10) / 10;
-
-    // معلومات مفيدة: زاوية الشاشة + مدى التذبذب
-    const ang = meta && typeof meta.angle === 'number' ? meta.angle : getScreenAngle();
-    const pr = meta && typeof meta.pRange === 'number' ? meta.pRange : 0;
-    const rr = meta && typeof meta.rRange === 'number' ? meta.rRange : 0;
-
-    vals.textContent = `P:${p}°  R:${r}°  ↻${ang}°`;
-
-    // الحالة: نريد "مستوٍ + ثابت"
-    if(isStable){
-      dot.style.background = 'var(--accent)';
-      text.textContent = L.levelOkStable;
-      enableCapture();
-    } else if(isLevel){
-      dot.style.background = 'var(--warning)';
-      text.textContent = (currentLang==='ar')
-        ? `جيد… ثبّت لحظة (${Math.round(STABILITY_MS/100)/10}s) | اهتزاز P:${(pr).toFixed(2)} R:${(rr).toFixed(2)}`
-        : `Almost… hold steady (${Math.round(STABILITY_MS/100)/10}s) | jitter P:${(pr).toFixed(2)} R:${(rr).toFixed(2)}`;
-      disableCapture();
-    } else {
-      dot.style.background = 'var(--danger)';
-      text.textContent = L.levelHold(LEVEL_TOL_DEG);
-      disableCapture();
-    }
-  }
-
-  // معالج DeviceMotion
-  function handleDeviceMotion(e){
-    const ag = e.accelerationIncludingGravity;
-    if(!ag) return;
-
-    // بعض الأجهزة تعطي null أحياناً
-    const ax = (typeof ag.x === 'number') ? ag.x : 0;
-    const ay = (typeof ag.y === 'number') ? ag.y : 0;
-    const az = (typeof ag.z === 'number') ? ag.z : 0;
-
-    const { pitch, roll } = computePitchRollFromGravity(ax, ay, az);
-
-    // حفظ الخام
-    lastPitchRaw = pitch;
-    lastRollRaw = roll;
-
-    // تعويض الدوران
-    const comp = compensateForScreenAngle(pitch, roll);
-
-    // تنعيم
-    pitchFiltered = smooth(comp.pitch, pitchFiltered);
-    rollFiltered  = smooth(comp.roll,  rollFiltered);
-
-    // تحديث الحالة
-    setLevelState(pitchFiltered, rollFiltered, { angle: comp.angle });
-  }
-
-  let motionListening = false;
-
-  async function enableMotionSensors(){
-    const ok = await requestMotionPermissionIfNeeded();
-    if(!ok){
-      toast(currentLang==='ar' ? 'تم رفض إذن الحساسات.' : 'Motion permission denied.');
-      disableCapture();
-      return false;
-    }
-    if(!motionListening){
-      window.addEventListener('devicemotion', handleDeviceMotion, { passive:true });
-      motionListening = true;
-    }
-    return true;
-  }
-
-  function removeMotionSensors(){
-    if(motionListening){
-      window.removeEventListener('devicemotion', handleDeviceMotion);
-      motionListening = false;
-    }
-    isLevel = false;
-    isStable = false;
-    stableSince = null;
-    windowSamples = [];
-    lastPitchRaw = lastRollRaw = null;
-    pitchFiltered = rollFiltered = null;
-  }
-
-  // ===========================
-  //  Translations
-  // ===========================
-  const TT = {
-    ar: {
-      appTitle: 'ملتزم — كاميرا الفحص',
-      appSub: 'خدمة فحص ميداني — نسخة تجريبية',
-      hint: 'وجّه الكاميرا نحو المنطقة المراد فحصها',
-      modalTitle: 'نتيجة الفحص',
-      retry: 'إعادة التحليل',
-      newScan: 'فحص جديد',
-      close: 'إغلاق ✕',
-      lang: 'EN',
-      rule: (x)=> x==='defects' ? 'فحص العيوب' : `القاعدة ${x}`,
-      levelHold: (tol)=> `عدّل وضع الهاتف حتى يصبح قريبًا من الاستواء (±${tol}°)`,
-      levelOkStable: '✅ مستوٍ وثابت — يمكنك الالتقاط',
-      emailSent: 'تم إرسال نتيجة الفحص بالبريد ✅',
-      emailFail: 'تعذر إرسال البريد. تأكد من إعداد EmailJS.',
-      cameraFail: 'فشل تشغيل الكاميرا. تأكد من منح الإذن.',
-      captureFail: 'فشل التقاط الصورة.',
-      needStable: 'ثبّت الهاتف حتى يصبح مستويًا وثابتًا قبل الالتقاط.'
-    },
-    en: {
-      appTitle: 'Multazim — Inspection Camera',
-      appSub: 'Field inspection service — Beta',
-      hint: 'Point the camera at the area to inspect',
-      modalTitle: 'Inspection Result',
-      retry: 'Retry',
-      newScan: 'New Scan',
-      close: 'Close ✕',
-      lang: 'AR',
-      rule: (x)=> x==='defects' ? 'Defects Scan' : `Rule ${x}`,
-      levelHold: (tol)=> `Adjust device to be near level (±${tol}°)`,
-      levelOkStable: '✅ Level & steady — you can capture',
-      emailSent: 'Result emailed ✅',
-      emailFail: 'Email failed. Check EmailJS setup.',
-      cameraFail: 'Unable to start camera. Please grant permission.',
-      captureFail: 'Capture failed.',
-      needStable: 'Hold device level and steady before capturing.'
-    }
+  const map = {
+    compliant: { cls:'ok', color:'linear-gradient(90deg, rgba(25,195,125,.95), rgba(11,95,255,.65))',
+      labelAr:'✓ مطابق', labelEn:'✓ Compliant' },
+    'non-compliant': { cls:'no', color:'linear-gradient(90deg, rgba(239,68,68,.95), rgba(245,158,11,.55))',
+      labelAr:'✕ غير مطابق', labelEn:'✕ Non-Compliant' },
+    uncertain: { cls:'maybe', color:'linear-gradient(90deg, rgba(245,158,11,.95), rgba(11,95,255,.55))',
+      labelAr:'؟ غير مؤكد', labelEn:'？ Uncertain' }
   };
 
-  // ===========================
-  //  Helpers
-  // ===========================
-  function toast(msg){
-    const el = document.getElementById('toast');
-    el.textContent = msg;
-    el.classList.add('show');
-    setTimeout(()=> el.classList.remove('show'), 2400);
+  const m = map[res.status];
+  badge.className = 'badge ' + m.cls;
+  badge.textContent = (currentLang==='ar') ? m.labelAr : m.labelEn;
+
+  confText.textContent = (currentLang==='ar')
+    ? `مستوى الثقة: ${(res.confidence*100).toFixed(0)}%`
+    : `Confidence: ${(res.confidence*100).toFixed(0)}%`;
+
+  fill.style.background = m.color;
+  requestAnimationFrame(()=> { fill.style.width = Math.round(res.confidence*100) + '%'; });
+
+  msg.textContent = res.message;
+}
+
+/* =========================
+   Camera
+   ========================= */
+async function startCamera(){
+  stopCamera();
+  try{
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode, width: { ideal: 1280 }, height: { ideal: 720 } },
+      audio: false
+    });
+    const video = document.getElementById('video');
+    video.srcObject = stream;
+
+    document.getElementById('perm').style.display = 'none';
+    document.getElementById('stage').style.display = 'block';
+
+    await video.play();
+    resizeOverlay();
+    drawOverlayLoop();
+
+    setCVState('ready');
+  }catch(e){
+    toast(TT[currentLang].cameraFail);
+    console.error(e);
   }
+}
 
-  function setTexts(){
-    const L = TT[currentLang];
-    document.documentElement.lang = currentLang;
-    document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
-
-    document.getElementById('appTitle').textContent = L.appTitle;
-    document.getElementById('appSub').textContent = L.appSub;
-    document.getElementById('hint').textContent = L.hint;
-
-    document.getElementById('modalTitle').textContent = L.modalTitle;
-    document.getElementById('retryBtn').textContent = L.retry;
-    document.getElementById('newBtn').textContent = L.newScan;
-    document.getElementById('modalClose').textContent = L.close;
-    document.getElementById('langLabel').textContent = L.lang;
-
-    document.getElementById('ruleLabel').textContent = L.rule(selectedType);
-
-    // تحديث نص المستوى حسب الحالة الحالية
-    const levelText = document.getElementById('levelText');
-    if(isStable) levelText.textContent = L.levelOkStable;
-    else levelText.textContent = L.levelHold(LEVEL_TOL_DEG);
+function stopCamera(){
+  if(stream){
+    stream.getTracks().forEach(tr=> tr.stop());
+    stream = null;
   }
+}
 
-  function disableCapture(){
-    const captureBtn = document.getElementById('captureBtn');
-    captureBtn.style.opacity = '.55';
-    captureBtn.style.pointerEvents = 'none';
-  }
-  function enableCapture(){
-    const captureBtn = document.getElementById('captureBtn');
-    captureBtn.style.opacity = '1';
-    captureBtn.style.pointerEvents = 'auto';
-  }
+document.getElementById('permBtn').addEventListener('click', startCamera);
 
-  // ===========================
-  //  Camera
-  // ===========================
-  async function startCamera(){
-    stopCamera();
-    try{
-      stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode, width: { ideal: 1280 }, height: { ideal: 720 } },
-        audio: false
-      });
+/* =========================
+   Overlay drawing (live)
+   - يرسم إرشادات + إن توفرت نتيجة CV يرسم الخطين + المثلث
+   ========================= */
+let rafId = null;
 
-      const video = document.getElementById('video');
-      video.srcObject = stream;
+function resizeOverlay(){
+  const overlay = document.getElementById('overlay');
+  const rect = overlay.getBoundingClientRect();
+  overlay.width = Math.floor(rect.width * devicePixelRatio);
+  overlay.height = Math.floor(rect.height * devicePixelRatio);
+}
 
-      document.getElementById('perm').style.display = 'none';
-      document.getElementById('stage').style.display = 'block';
+function drawOverlayLoop(){
+  const overlay = document.getElementById('overlay');
+  const ctx = overlay.getContext('2d');
 
-      await video.play();
-
-      resizeOverlay();
-      drawLoop();
-
-      // Motion sensors
-      disableCapture();              // قفل افتراضي
-      await enableMotionSensors();   // يفتح فقط عند "مستوٍ وثابت"
-
-    }catch(e){
-      toast(TT[currentLang].cameraFail);
-      console.error(e);
-    }
-  }
-
-  function stopCamera(){
-    if(stream){
-      stream.getTracks().forEach(tr=> tr.stop());
-      stream = null;
-    }
-  }
-
-  // ===========================
-  //  Overlay drawing
-  // ===========================
-  function resizeOverlay(){
-    const overlay = document.getElementById('overlay');
-    const rect = overlay.getBoundingClientRect();
-    overlay.width = Math.floor(rect.width * devicePixelRatio);
-    overlay.height = Math.floor(rect.height * devicePixelRatio);
-  }
-
-  function drawGuide(ctx, type){
-    const w = ctx.canvas.width;
-    const h = ctx.canvas.height;
-    const cx = w/2, cy = h/2;
-
+  const loop = ()=>{
+    const w = overlay.width, h = overlay.height;
     ctx.clearRect(0,0,w,h);
 
-    ctx.strokeStyle = 'rgba(11,95,255,.95)';
-    ctx.lineWidth = 4;
-    ctx.shadowColor = 'rgba(0,0,0,.55)';
-    ctx.shadowBlur = 8;
+    // إرشادات خفيفة
+    drawGuide(ctx, selectedType);
 
-    if(type === '4.5'){
-      const size = Math.min(w,h)*0.38;
-      ctx.beginPath();
-      ctx.moveTo(cx - size/2, cy);
-      ctx.lineTo(cx + size/2, cy);
-      ctx.moveTo(cx, cy - size/2);
-      ctx.lineTo(cx, cy + size/2);
-      ctx.moveTo(cx - size/3, cy - size/3);
-      ctx.lineTo(cx + size/3, cy + size/3);
-      ctx.stroke();
-
-      ctx.shadowBlur = 0;
-      ctx.fillStyle = 'rgba(245,247,250,.92)';
-      ctx.font = '900 28px system-ui, Arial';
-      ctx.textAlign = 'center';
-      ctx.fillText('45°', cx, cy - size/2 - 18);
-    } else if(type === '4.7'){
-      const rw = w*0.62;
-      const rh = h*0.36;
-      ctx.strokeRect(cx - rw/2, cy - rh/2, rw, rh);
-    } else if(type === '5.8'){
-      const r = Math.min(w,h)*0.26;
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, Math.PI*2);
-      ctx.stroke();
-    } else {
-      ctx.strokeStyle = 'rgba(11,95,255,.25)';
-      ctx.lineWidth = 2;
-      for(let i=1;i<4;i++){
-        ctx.beginPath();
-        ctx.moveTo(w*i/4, 0);
-        ctx.lineTo(w*i/4, h);
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.moveTo(0, h*i/4);
-        ctx.lineTo(w, h*i/4);
-        ctx.stroke();
-      }
+    // إذا لدينا نتيجة CV، ارسم الخطين + المثلث على نفس الإطار (تقريباً)
+    if(lastCV && lastCV.hLine && lastCV.vLine && lastCV.intersection){
+      drawDetectedGeometry(ctx, lastCV);
     }
-  }
+    rafId = requestAnimationFrame(loop);
+  };
+  loop();
+}
 
-  let rafId = null;
-  function drawLoop(){
-    const overlay = document.getElementById('overlay');
-    const ctx = overlay.getContext('2d');
-    const loop = ()=>{
-      drawGuide(ctx, selectedType);
-      rafId = requestAnimationFrame(loop);
+function stopOverlayLoop(){
+  if(rafId) cancelAnimationFrame(rafId);
+  rafId = null;
+}
+
+function drawGuide(ctx, type){
+  const w = ctx.canvas.width;
+  const h = ctx.canvas.height;
+  const cx = w/2, cy = h/2;
+
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,.55)';
+  ctx.shadowBlur = 10;
+
+  ctx.strokeStyle = 'rgba(11,95,255,.25)';
+  ctx.lineWidth = 2;
+
+  // إطار وسط الشاشة لتوجيه المستخدم نحو الحافة
+  const rw = w * 0.68;
+  const rh = h * 0.36;
+  ctx.beginPath();
+  roundRect(ctx, cx-rw/2, cy-rh/2, rw, rh, 24);
+  ctx.stroke();
+
+  // خطوط إرشاد
+  ctx.strokeStyle = 'rgba(25,195,125,.18)';
+  ctx.beginPath();
+  ctx.moveTo(cx, cy-rh/2); ctx.lineTo(cx, cy+rh/2);
+  ctx.moveTo(cx-rw/2, cy); ctx.lineTo(cx+rw/2, cy);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+function drawDetectedGeometry(ctx, cvRes){
+  // cvRes line coords are in "capture image space". We map them to overlay space
+  // باستخدام معاملات التحجيم بين captureCanvas و overlay
+  const overlay = ctx.canvas;
+  const map = cvRes.map; // {sx, sy}
+  if(!map) return;
+
+  const toO = (pt)=> ({ x: pt.x * map.sx, y: pt.y * map.sy });
+
+  const h1 = toO(cvRes.hLine.p1), h2 = toO(cvRes.hLine.p2);
+  const v1 = toO(cvRes.vLine.p1), v2 = toO(cvRes.vLine.p2);
+  const I  = toO(cvRes.intersection);
+
+  ctx.save();
+  ctx.lineWidth = 6;
+  ctx.lineCap = 'round';
+  ctx.shadowColor = 'rgba(0,0,0,.6)';
+  ctx.shadowBlur = 10;
+
+  // الخط الأفقي (الأرض)
+  ctx.strokeStyle = 'rgba(25,195,125,.95)';
+  ctx.beginPath(); ctx.moveTo(h1.x,h1.y); ctx.lineTo(h2.x,h2.y); ctx.stroke();
+
+  // الخط العمودي (الجدار)
+  ctx.strokeStyle = 'rgba(11,95,255,.95)';
+  ctx.beginPath(); ctx.moveTo(v1.x,v1.y); ctx.lineTo(v2.x,v2.y); ctx.stroke();
+
+  // نقطة التقاطع
+  ctx.fillStyle = 'rgba(245,247,250,.95)';
+  ctx.beginPath(); ctx.arc(I.x, I.y, 7, 0, Math.PI*2); ctx.fill();
+
+  // مثلث (ضلع على الأرض + ضلع على الجدار + وتر بين نقطتين بعيدتين ثابتة)
+  // نختار نقطتين على كل خط على بعد ثابت من التقاطع
+  const len = Math.min(overlay.width, overlay.height) * 0.16;
+
+  const dirH = norm({x:h2.x-h1.x, y:h2.y-h1.y});
+  const dirV = norm({x:v2.x-v1.x, y:v2.y-v1.y});
+
+  const A = { x: I.x + dirH.x * len, y: I.y + dirH.y * len };
+  const B = { x: I.x + dirV.x * len, y: I.y + dirV.y * len };
+
+  ctx.lineWidth = 4;
+  ctx.strokeStyle = 'rgba(245,247,250,.85)';
+  ctx.beginPath();
+  ctx.moveTo(I.x, I.y);
+  ctx.lineTo(A.x, A.y);
+  ctx.lineTo(B.x, B.y);
+  ctx.closePath();
+  ctx.stroke();
+
+  // نص الزاوية
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = 'rgba(245,247,250,.95)';
+  ctx.font = '900 28px system-ui, Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText(cvRes.angleDeg.toFixed(1) + '°', I.x, I.y - 16);
+
+  ctx.restore();
+}
+
+function roundRect(ctx, x, y, w, h, r){
+  const rr = Math.min(r, w/2, h/2);
+  ctx.moveTo(x+rr, y);
+  ctx.arcTo(x+w, y, x+w, y+h, rr);
+  ctx.arcTo(x+w, y+h, x, y+h, rr);
+  ctx.arcTo(x, y+h, x, y, rr);
+  ctx.arcTo(x, y, x+w, y, rr);
+}
+
+/* =========================
+   Computer Vision: OpenCV Hough lines
+   ========================= */
+function ensureCVReady(){
+  return new Promise((resolve, reject)=>{
+    const t0 = Date.now();
+    const check = ()=>{
+      if(typeof cv !== 'undefined' && cv.Mat){
+        // بعض النسخ تحتاج onRuntimeInitialized
+        if(cv.onRuntimeInitialized){
+          // إذا كان runtime جاهزاً
+          resolve(true);
+        } else {
+          resolve(true);
+        }
+        return;
+      }
+      if(Date.now() - t0 > 8000) return reject(new Error("OpenCV load timeout"));
+      requestAnimationFrame(check);
     };
-    loop();
-  }
+    check();
+  });
+}
 
-  function stopOverlayLoop(){
-    if(rafId) cancelAnimationFrame(rafId);
-    rafId = null;
-  }
+function captureFrameToCanvas(){
+  const video = document.getElementById('video');
+  const canvas = document.getElementById('captureCanvas');
+  const ctx = canvas.getContext('2d');
 
-  function setType(type){
-    selectedType = type;
-    document.querySelectorAll('.chip').forEach(b=>{
-      b.classList.toggle('active', b.dataset.type===type);
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  ctx.drawImage(video, 0, 0);
+  return canvas;
+}
+
+function matFromCanvas(canvas){
+  // OpenCV read
+  return cv.imread(canvas);
+}
+
+function detectWallFloorAngle(canvas){
+  // يرجع: {angleDeg, confidence, hLine, vLine, intersection, map}
+  // map: لتحويل نقاط canvas إلى overlay
+
+  const src = matFromCanvas(canvas);
+  const w = src.cols, h = src.rows;
+
+  // Preprocess
+  const gray = new cv.Mat();
+  cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+
+  const blur = new cv.Mat();
+  cv.GaussianBlur(gray, blur, new cv.Size(5,5), 0, 0, cv.BORDER_DEFAULT);
+
+  const edges = new cv.Mat();
+  // Canny thresholds يمكن تعديلها حسب البيئات
+  cv.Canny(blur, edges, 60, 160);
+
+  // HoughLinesP
+  const lines = new cv.Mat();
+  const rho = 1;
+  const theta = Math.PI/180;
+  const threshold = 80;
+  const minLineLength = Math.min(w,h) * 0.25;
+  const maxLineGap = 15;
+
+  cv.HoughLinesP(edges, lines, rho, theta, threshold, minLineLength, maxLineGap);
+
+  // استخراج المرشحين
+  const candidates = [];
+  for(let i=0; i<lines.rows; i++){
+    const x1 = lines.data32S[i*4+0];
+    const y1 = lines.data32S[i*4+1];
+    const x2 = lines.data32S[i*4+2];
+    const y2 = lines.data32S[i*4+3];
+
+    const dx = x2-x1, dy = y2-y1;
+    const len = Math.hypot(dx,dy);
+    if(len < minLineLength) continue;
+
+    // زاوية الخط بالنسبة للأفق
+    let ang = Math.atan2(dy, dx) * 180 / Math.PI; // -180..180
+    // اجعلها 0..180
+    if(ang < 0) ang += 180;
+
+    // وزن: طول + قرب من منتصف الشاشة (نعطي الأفضل للحافة في المنتصف)
+    const mx = (x1+x2)/2, my = (y1+y2)/2;
+    const centerScore = 1.0 - (Math.hypot(mx-w/2, my-h/2) / Math.hypot(w/2,h/2));
+    const score = len * (0.75 + 0.25 * Math.max(0, centerScore));
+
+    candidates.push({
+      p1:{x:x1,y:y1}, p2:{x:x2,y:y2},
+      len, ang, score
     });
-    setTexts();
   }
 
-  // ===========================
-  //  Capture & Analyze (محاكاة)
-  // ===========================
-  async function capture(){
-    // قفل نهائي
-    if(!isStable){
-      toast(TT[currentLang].needStable);
+  // مصنف: أفقي قريب من 0/180 (مثلاً <=20° أو >=160°)، عمودي قريب من 90 (مثلاً 70..110)
+  const H = candidates.filter(c => (c.ang <= 20 || c.ang >= 160)).sort((a,b)=>b.score-a.score);
+  const V = candidates.filter(c => (c.ang >= 70 && c.ang <= 110)).sort((a,b)=>b.score-a.score);
+
+  // تنظيف
+  src.delete(); gray.delete(); blur.delete(); edges.delete(); lines.delete();
+
+  if(H.length === 0 || V.length === 0){
+    return null;
+  }
+
+  // الأفضل
+  const hLine = H[0];
+  const vLine = V[0];
+
+  // تقاطع الخطين (كخطين لا كقطع)
+  const inter = lineIntersection(hLine.p1, hLine.p2, vLine.p1, vLine.p2);
+  if(!inter) return null;
+
+  // زاوية بين الاتجاهين (0..90)
+  const u = direction(hLine.p1, hLine.p2);
+  const v = direction(vLine.p1, vLine.p2);
+  let angle = angleBetween(u, v); // 0..180
+  angle = Math.min(angle, 180-angle); // 0..90
+
+  // Confidence: يعتمد على طول الخطين وعدد الخطوط المكتشفة (تقريبي)
+  const strength = (hLine.len + vLine.len) / (Math.min(w,h) * 1.2);
+  const density = Math.min(1, candidates.length / 40);
+  const confidence = clamp(0.35 + 0.45*clamp(strength,0,1) + 0.20*density, 0, 0.98);
+
+  return {
+    angleDeg: angle,
+    confidence,
+    hLine: { p1:hLine.p1, p2:hLine.p2, ang:hLine.ang, len:hLine.len },
+    vLine: { p1:vLine.p1, p2:vLine.p2, ang:vLine.ang, len:vLine.len },
+    intersection: inter,
+    rawCount: candidates.length
+  };
+}
+
+function clamp(x,a,b){ return Math.max(a, Math.min(b, x)); }
+
+function direction(p1,p2){
+  const dx = p2.x-p1.x, dy = p2.y-p1.y;
+  const n = Math.hypot(dx,dy) || 1;
+  return { x: dx/n, y: dy/n };
+}
+
+function angleBetween(u,v){
+  const dot = u.x*v.x + u.y*v.y;
+  const d = clamp(dot, -1, 1);
+  return Math.acos(d) * 180 / Math.PI;
+}
+
+function lineIntersection(a,b,c,d){
+  // تقاطع خط AB مع CD
+  const A1 = b.y - a.y;
+  const B1 = a.x - b.x;
+  const C1 = A1*a.x + B1*a.y;
+
+  const A2 = d.y - c.y;
+  const B2 = c.x - d.x;
+  const C2 = A2*c.x + B2*c.y;
+
+  const det = A1*B2 - A2*B1;
+  if(Math.abs(det) < 1e-6) return null;
+
+  const x = (B2*C1 - B1*C2) / det;
+  const y = (A1*C2 - A2*C1) / det;
+  return { x, y };
+}
+
+function norm(v){
+  const n = Math.hypot(v.x,v.y) || 1;
+  return { x:v.x/n, y:v.y/n };
+}
+
+/* =========================
+   Rule evaluation (Rule 4.5 -> check ~45°)
+   ========================= */
+function evaluateRule(angleDeg, confidence){
+  const L = TT[currentLang];
+
+  // افتراض عملي: القاعدة 4.5 = زاوية مطلوبة 45°
+  if(selectedType === '4.5'){
+    const target = 45;
+    const tol = 3.0; // يمكنك تعديلها حسب السياسة
+    const diff = Math.abs(angleDeg - target);
+
+    // نجعل الحكم مرتبط بالثقة أيضاً
+    if(confidence < 0.55){
+      return {
+        status:'uncertain',
+        confidence,
+        message: (currentLang==='ar')
+          ? `تم حساب زاوية تقريبية ${angleDeg.toFixed(1)}° لكن الثقة منخفضة. قرّب الكاميرا وحسّن الإضاءة.`
+          : `Angle ~${angleDeg.toFixed(1)}° but confidence is low. Move closer and improve lighting.`
+      };
+    }
+    if(diff <= tol){
+      return {
+        status:'compliant',
+        confidence,
+        message: (currentLang==='ar')
+          ? `✅ ${L.rule45}: الزاوية ${angleDeg.toFixed(1)}° ضمن السماحية (±${tol}°).`
+          : `✅ ${L.rule45}: angle ${angleDeg.toFixed(1)}° within tolerance (±${tol}°).`
+      };
+    }
+    return {
+      status:'non-compliant',
+      confidence,
+      message: (currentLang==='ar')
+        ? `✕ ${L.rule45}: الزاوية ${angleDeg.toFixed(1)}° خارج السماحية (±${tol}°).`
+        : `✕ ${L.rule45}: angle ${angleDeg.toFixed(1)}° outside tolerance (±${tol}°).`
+    };
+  }
+
+  // لباقي الأنواع (4.7/5.8/defects): نعرض زاوية فقط كمعلومة + تصنيف "غير مؤكد"
+  return {
+    status:'uncertain',
+    confidence,
+    message: (currentLang==='ar')
+      ? `تم استخراج زاوية تقاطع تقريبية: ${angleDeg.toFixed(1)}°. هذا الفحص مخصص حالياً لزوايا 45° فقط.`
+      : `Detected intersection angle: ${angleDeg.toFixed(1)}°. This CV check is currently optimized for 45° only.`
+  };
+}
+
+/* =========================
+   Capture + Analyze
+   ========================= */
+async function captureAndAnalyze(){
+  const btn = document.getElementById('captureBtn');
+  const L = TT[currentLang];
+
+  btn.classList.add('processing');
+  setCVState('working');
+  lastCV = null;
+
+  try{
+    await ensureCVReady();
+
+    const canvas = captureFrameToCanvas();
+
+    // صورة للمعاينة
+    lastBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.86));
+    const url = URL.createObjectURL(lastBlob);
+    document.getElementById('preview').src = url;
+
+    openModalLoading();
+
+    // CV detect
+    const result = detectWallFloorAngle(canvas);
+
+    // تجهيز mapping إلى overlay
+    if(result){
+      const overlay = document.getElementById('overlay');
+      const sx = overlay.width / canvas.width;
+      const sy = overlay.height / canvas.height;
+      result.map = { sx, sy };
+    }
+
+    if(!result){
+      setCVState('fail');
+      // UI result
+      const resUI = {
+        status:'uncertain',
+        confidence: 0.35,
+        message: (currentLang==='ar')
+          ? 'لم ننجح في اكتشاف خطين واضحين. قرّب الكاميرا على الحافة وزد الإضاءة، ثم أعد المحاولة.'
+          : 'Could not detect two clear lines. Move closer to the edge and improve lighting, then retry.'
+      };
+      showResultUI(resUI);
+      lastCV = null;
+      btn.classList.remove('processing');
       return;
     }
 
-    const btn = document.getElementById('captureBtn');
-    btn.classList.add('processing');
+    // save + show
+    lastCV = result;
+    setCVState('ok', result);
 
+    const resUI = evaluateRule(result.angleDeg, result.confidence);
+    showResultUI(resUI);
+
+    // إرسال بريد تلقائياً بعد كل فحص
     try{
-      const video = document.getElementById('video');
-      const canvas = document.getElementById('captureCanvas');
-      const ctx = canvas.getContext('2d');
-
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      ctx.drawImage(video, 0, 0);
-
-      lastBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.86));
-      const url = URL.createObjectURL(lastBlob);
-      document.getElementById('preview').src = url;
-
-      openModalLoading();
-
-      setTimeout(async ()=>{
-        const result = mockResult();
-        showResult(result);
-
-        // إرسال بريد بالنتيجة
-        try{
-          await sendResultEmail(result);
-          toast(TT[currentLang].emailSent);
-        }catch(err){
-          console.error(err);
-          toast(TT[currentLang].emailFail);
-        }
-      }, 900);
-
-    }catch(e){
-      toast(TT[currentLang].captureFail);
-      console.error(e);
-    }finally{
-      btn.classList.remove('processing');
-    }
-  }
-
-  function openModalLoading(){
-    const L = TT[currentLang];
-    document.getElementById('modal').classList.add('active');
-    document.getElementById('badge').className = 'badge maybe';
-    document.getElementById('badge').textContent = currentLang==='ar' ? '⏳ جاري التحليل' : '⏳ Analyzing';
-    document.getElementById('confText').textContent = currentLang==='ar' ? 'مستوى الثقة: —' : 'Confidence: —';
-    document.getElementById('fill').style.width = '0%';
-    document.getElementById('fill').style.background = 'linear-gradient(90deg, rgba(245,158,11,.9), rgba(11,95,255,.9))';
-    document.getElementById('msg').textContent = currentLang==='ar' ? 'يتم الآن معالجة الصورة…' : 'Processing the image…';
-    document.getElementById('ruleLabel').textContent = L.rule(selectedType);
-  }
-
-  function closeModal(){
-    document.getElementById('modal').classList.remove('active');
-    const img = document.getElementById('preview');
-    if(img.src.startsWith('blob:')) URL.revokeObjectURL(img.src);
-    img.src = '';
-  }
-
-  function mockResult(){
-    const pick = Math.random();
-    if(pick < 0.45){
-      return { status:'compliant', confidence: 92 + Math.floor(Math.random()*6),
-        msgAr:'تم اكتشاف المواصفة المطلوبة — مطابق للمعايير.',
-        msgEn:'Required specification detected — compliant.' };
-    } else if(pick < 0.8){
-      return { status:'non-compliant', confidence: 78 + Math.floor(Math.random()*10),
-        msgAr:'تم رصد عدم مطابقة — يلزم إجراء تصحيحي.',
-        msgEn:'Non-compliance detected — corrective action required.' };
-    }
-    return { status:'uncertain', confidence: 55 + Math.floor(Math.random()*18),
-      msgAr:'غير قادر على التحديد بوضوح — يُنصح بإعادة الالتقاط مع إضاءة أفضل.',
-      msgEn:'Unable to determine — retake with better lighting.' };
-  }
-
-  function showResult(r){
-    const fill = document.getElementById('fill');
-    const badge = document.getElementById('badge');
-    const confText = document.getElementById('confText');
-    const msg = document.getElementById('msg');
-
-    const map = {
-      compliant: { cls:'ok', color:'linear-gradient(90deg, rgba(25,195,125,.95), rgba(11,95,255,.65))',
-        labelAr:'✓ مطابق', labelEn:'✓ Compliant' },
-      'non-compliant': { cls:'no', color:'linear-gradient(90deg, rgba(239,68,68,.95), rgba(245,158,11,.55))',
-        labelAr:'✕ غير مطابق', labelEn:'✕ Non-Compliant' },
-      uncertain: { cls:'maybe', color:'linear-gradient(90deg, rgba(245,158,11,.95), rgba(11,95,255,.55))',
-        labelAr:'؟ غير مؤكد', labelEn:'？ Uncertain' }
-    };
-
-    const m = map[r.status];
-    badge.className = 'badge ' + m.cls;
-    badge.textContent = (currentLang==='ar') ? m.labelAr : m.labelEn;
-
-    confText.textContent = (currentLang==='ar')
-      ? `مستوى الثقة: ${r.confidence}%`
-      : `Confidence: ${r.confidence}%`;
-
-    fill.style.background = m.color;
-    requestAnimationFrame(()=> { fill.style.width = r.confidence + '%'; });
-
-    msg.textContent = (currentLang==='ar') ? r.msgAr : r.msgEn;
-  }
-
-  // ===========================
-  //  EmailJS: إرسال نتيجة الفحص
-  // ===========================
-  async function sendResultEmail(result){
-    // لا تحاول الإرسال بدون مفاتيح
-    if(!EMAILJS_PUBLIC_KEY || EMAILJS_PUBLIC_KEY.includes("PUT_") ||
-       !EMAILJS_SERVICE_ID || EMAILJS_SERVICE_ID.includes("PUT_") ||
-       !EMAILJS_TEMPLATE_ID || EMAILJS_TEMPLATE_ID.includes("PUT_")){
-      throw new Error("EmailJS keys not set");
+      await sendResultEmail({
+        ...resUI,
+        angleDeg: result.angleDeg,
+        rawCount: result.rawCount
+      });
+      toast(L.emailSent);
+    }catch(err){
+      console.error(err);
+      toast(L.emailFail);
     }
 
-    const L = TT[currentLang];
-    const ts = new Date();
+  }catch(e){
+    console.error(e);
+    setCVState('fail');
+    toast(L.captureFail);
+  }finally{
+    btn.classList.remove('processing');
+  }
+}
 
-    // استخدم القيم المفلترة لأنها “أقرب للحقيقة”
-    const p = (typeof pitchFiltered === 'number') ? pitchFiltered : lastPitchRaw;
-    const r = (typeof rollFiltered === 'number') ? rollFiltered : lastRollRaw;
+/* =========================
+   EmailJS send
+   ========================= */
+async function sendResultEmail(uiRes){
+  const L = TT[currentLang];
 
-    const payload = {
-      to_email: EMAIL_TO,
-      rule: L.rule(selectedType),
-      rule_code: selectedType,
-      status: result.status,
-      confidence: result.confidence + '%',
-      message: (currentLang==='ar') ? result.msgAr : result.msgEn,
-      pitch: (typeof p === 'number') ? p.toFixed(2) + '°' : 'N/A',
-      roll:  (typeof r === 'number') ? r.toFixed(2) + '°' : 'N/A',
-      screen_angle: String(getScreenAngle()),
-      stable: isStable ? 'YES' : 'NO',
-      timestamp: ts.toLocaleString(),
-      lang: currentLang.toUpperCase()
-    };
-
-    return emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, payload);
+  if(!lastBlob || !uiRes){
+    throw new Error(L.needCV);
   }
 
-  // ===========================
-  //  Events
-  // ===========================
-  document.getElementById('permBtn').addEventListener('click', startCamera);
+  if(!EMAILJS_PUBLIC_KEY || EMAILJS_PUBLIC_KEY.includes("PUT_") ||
+     !EMAILJS_SERVICE_ID || EMAILJS_SERVICE_ID.includes("PUT_") ||
+     !EMAILJS_TEMPLATE_ID || EMAILJS_TEMPLATE_ID.includes("PUT_")){
+    throw new Error("EmailJS keys not set");
+  }
 
-  document.getElementById('langBtn').addEventListener('click', ()=>{
-    currentLang = (currentLang==='ar') ? 'en' : 'ar';
-    setTexts();
-  });
+  const ts = new Date();
 
-  document.getElementById('types').addEventListener('click', (e)=>{
-    const btn = e.target.closest('.chip');
-    if(!btn) return;
-    setType(btn.dataset.type);
-  });
+  const payload = {
+    to_email: EMAIL_TO,
+    rule: L.rule(selectedType),
+    rule_code: selectedType,
+    status: uiRes.status,
+    confidence: (uiRes.confidence*100).toFixed(0) + '%',
+    message: uiRes.message,
+    angle_deg: (typeof uiRes.angleDeg === 'number') ? uiRes.angleDeg.toFixed(2) : 'N/A',
+    cv_lines_count: (typeof uiRes.rawCount === 'number') ? String(uiRes.rawCount) : 'N/A',
+    timestamp: ts.toLocaleString(),
+    lang: currentLang.toUpperCase()
+  };
 
-  document.getElementById('captureBtn').addEventListener('click', capture);
+  return emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, payload);
+}
 
-  document.getElementById('retryBtn').addEventListener('click', ()=>{
-    openModalLoading();
-    setTimeout(async ()=>{
-      const result = mockResult();
-      showResult(result);
-      try{
-        await sendResultEmail(result);
-        toast(TT[currentLang].emailSent);
-      }catch(err){
-        console.error(err);
-        toast(TT[currentLang].emailFail);
-      }
-    }, 800);
-  });
+/* =========================
+   Events
+   ========================= */
+document.getElementById('captureBtn').addEventListener('click', captureAndAnalyze);
 
-  document.getElementById('newBtn').addEventListener('click', closeModal);
-  document.getElementById('modalClose').addEventListener('click', closeModal);
+document.getElementById('retryBtn').addEventListener('click', async ()=>{
+  // إعادة التحليل باستخدام لقطة جديدة مباشرة (أفضل)
+  await captureAndAnalyze();
+});
 
-  document.getElementById('stopBtn').addEventListener('click', ()=>{
-    stopOverlayLoop();
-    stopCamera();
-    removeMotionSensors();
-    document.getElementById('stage').style.display = 'none';
-    document.getElementById('perm').style.display = 'flex';
-    disableCapture();
-    toast(currentLang==='ar' ? 'تم إيقاف الكاميرا.' : 'Camera stopped.');
-  });
+document.getElementById('newBtn').addEventListener('click', ()=>{
+  closeModal();
+});
 
-  document.getElementById('switchBtn').addEventListener('click', async ()=>{
-    facingMode = (facingMode === 'environment') ? 'user' : 'environment';
-    toast(currentLang==='ar'
-      ? (facingMode==='environment' ? 'الكاميرا الخلفية' : 'الكاميرا الأمامية')
-      : (facingMode==='environment' ? 'Rear camera' : 'Front camera')
-    );
-    removeMotionSensors();
-    await startCamera();
-  });
+document.getElementById('modalClose').addEventListener('click', closeModal);
 
-  window.addEventListener('resize', resizeOverlay);
+document.getElementById('stopBtn').addEventListener('click', ()=>{
+  stopOverlayLoop();
+  stopCamera();
+  lastCV = null;
+  document.getElementById('stage').style.display = 'none';
+  document.getElementById('perm').style.display = 'flex';
+  setCVState('ready');
+  toast(currentLang==='ar' ? 'تم إيقاف الكاميرا.' : 'Camera stopped.');
+});
 
-  // ===========================
-  //  Init
-  // ===========================
-  disableCapture();
+document.getElementById('switchBtn').addEventListener('click', async ()=>{
+  facingMode = (facingMode === 'environment') ? 'user' : 'environment';
+  toast(currentLang==='ar'
+    ? (facingMode==='environment' ? 'الكاميرا الخلفية' : 'الكاميرا الأمامية')
+    : (facingMode==='environment' ? 'Rear camera' : 'Front camera')
+  );
+  lastCV = null;
+  await startCamera();
+});
+
+document.getElementById('langBtn').addEventListener('click', ()=>{
+  currentLang = (currentLang==='ar') ? 'en' : 'ar';
   setTexts();
-</script>
+});
 
+document.getElementById('types').addEventListener('click', (e)=>{
+  const btn = e.target.closest('.chip');
+  if(!btn) return;
+  selectedType = btn.dataset.type;
+  document.querySelectorAll('.chip').forEach(b=>{
+    b.classList.toggle('active', b.dataset.type===selectedType);
+  });
+  setTexts();
+  lastCV = null; // لا نعرض هندسة قديمة على نوع جديد
+});
+
+window.addEventListener('resize', ()=>{
+  resizeOverlay();
+});
+
+/* =========================
+   Init
+   ========================= */
+setTexts();
+
+// تنبيه: OpenCV قد يتأخر بالتحميل، لا مشكلة — التحليل ينتظر ensureCVReady()
+</script>
 </body>
 </html>
