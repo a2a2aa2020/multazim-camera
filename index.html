@@ -1,792 +1,169 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>ملتزم — كاميرا الفحص</title>
+<meta charset="UTF-8">
+<title>ملتزم — فحص ميداني بالواقع المعزز</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    :root{
-      --bg:#050607;
-      --surface: rgba(20,24,28,.72);
-      --text:#F5F7FA;
-      --muted: rgba(245,247,250,.72);
-      --primary:#0B5FFF;
-      --accent:#19C37D;
-      --warning:#F59E0B;
-      --danger:#EF4444;
-      --radius-xl:22px;
-      --radius-lg:16px;
-      --shadow: 0 18px 60px rgba(0,0,0,.55);
-      --hairline: rgba(255,255,255,.12);
-      --safe-top: env(safe-area-inset-top);
-      --safe-bottom: env(safe-area-inset-bottom);
-
-      /* حل مشكلة 100vh على الموبايل */
-      --vh: 1vh;
-    }
-
-    *{box-sizing:border-box;margin:0;padding:0;}
-    body{
-      font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
-      background:var(--bg);
-      color:var(--text);
-      height: calc(var(--vh) * 100);
-      overflow:hidden;
-    }
-
-    .stage{
-      position:relative;
-      width:100vw;
-      height: calc(var(--vh) * 100);
-      background:#000;
-      overflow:hidden;
-    }
-
-    #video{position:absolute; inset:0;width:100%;height:100%;object-fit:cover;}
-    #captureCanvas{display:none;}
-    #overlay{position:absolute; inset:0;width:100%;height:100%;pointer-events:none;}
-
-    /* Top bar */
-    .topbar{
-      position:absolute; top:0; left:0; right:0;
-      padding: calc(12px + var(--safe-top)) 14px 10px;
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      z-index:20;
-      background: linear-gradient(180deg, rgba(0,0,0,.78) 0%, rgba(0,0,0,0) 100%);
-    }
-    .brand{display:flex; align-items:center; gap:10px; min-width:0;}
-    .logo{
-      width:34px;height:34px;border-radius:10px;
-      background: linear-gradient(135deg, rgba(11,95,255,.95), rgba(25,195,125,.95));
-      box-shadow: 0 10px 30px rgba(0,0,0,.35);
-      display:flex; align-items:center; justify-content:center;
-      font-weight:900;
-    }
-    .titleWrap{display:flex; flex-direction:column; min-width:0;}
-    .title{font-size:15px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-    .subtitle{font-size:12px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-
-    .topActions{display:flex; align-items:center; gap:10px;}
-    .iconBtn{
-      border:1px solid var(--hairline);
-      background: rgba(255,255,255,.08);
-      color: var(--text);
-      padding:10px 12px;
-      border-radius:14px;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      cursor:pointer;
-      display:flex; align-items:center; gap:8px;
-      font-weight:800;
-      font-size:13px;
-    }
-
-    /* Hint + CV pill */
-    .hint{
-      position:absolute;
-      top: calc(78px + var(--safe-top));
-      left:50%; transform: translateX(-50%);
-      z-index:20;
-      padding:10px 14px;
-      border-radius:999px;
-      border:1px solid var(--hairline);
-      background: rgba(20,24,28,.55);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      box-shadow: 0 10px 35px rgba(0,0,0,.45);
-      max-width:92vw;
-      text-align:center;
-      font-size:14px;
-    }
-
-    .cvPill{
-      position:absolute;
-      top: calc(124px + var(--safe-top));
-      left:50%; transform: translateX(-50%);
-      z-index:20;
-      padding:10px 14px;
-      border-radius:999px;
-      border:1px solid var(--hairline);
-      background: rgba(20,24,28,.62);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      font-weight:900;
-      font-size:13px;
-      display:flex;
-      gap:10px;
-      align-items:center;
-      justify-content:center;
-      box-shadow: 0 10px 35px rgba(0,0,0,.45);
-      max-width:92vw;
-      flex-wrap:wrap;
-    }
-    .cvDot{width:10px;height:10px;border-radius:999px;background: var(--warning);}
-    .cvVals{color: var(--muted); font-weight:800;}
-
-    /* Bottom sheet — خليها فوق شريط المتصفح + safe area */
-    .sheet{
-      position:absolute; left:0; right:0; bottom:0;
-      padding: 10px 12px calc(12px + var(--safe-bottom));
-      z-index:25;
-      background: linear-gradient(0deg, rgba(0,0,0,.92) 0%, rgba(0,0,0,0) 100%);
-    }
-
-    .sheetCard{
-      border: 1px solid var(--hairline);
-      background: rgba(20,24,28,.60);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-radius: var(--radius-xl);
-      padding: 12px;
-      box-shadow: var(--shadow);
-    }
-
-    .types{
-      display:flex; gap:10px; overflow-x:auto; padding: 6px 4px 10px;
-      scrollbar-width:none;
-    }
-    .types::-webkit-scrollbar{display:none;}
-
-    .chip{
-      border: 1px solid var(--hairline);
-      background: rgba(255,255,255,.06);
-      color: var(--text);
-      padding: 10px 14px;
-      border-radius: 999px;
-      font-size: 14px;
-      font-weight: 850;
-      cursor:pointer;
-      white-space:nowrap;
-      transition:.18s ease;
-      display:flex; align-items:center; gap:8px;
-    }
-    .chip.active{
-      background: rgba(11,95,255,.22);
-      border-color: rgba(11,95,255,.65);
-      box-shadow: 0 12px 30px rgba(11,95,255,.14);
-    }
-
-    .captureRow{
-      display:grid;
-      grid-template-columns: 46px 1fr 46px;
-      gap:12px;
-      padding: 6px 4px 2px;
-      align-items:center;
-    }
-    .miniBtn{
-      width:46px;height:46px;border-radius:16px;
-      border:1px solid var(--hairline);
-      background: rgba(255,255,255,.06);
-      color: var(--text);
-      cursor:pointer;
-      display:flex; align-items:center; justify-content:center;
-      font-size:18px;
-    }
-    .capture{
-      width:100%;
-      height:50px;
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,.18);
-      background: linear-gradient(135deg, rgba(11,95,255,.92), rgba(25,195,125,.92));
-      color:#fff;
-      box-shadow: 0 18px 45px rgba(0,0,0,.55);
-      cursor:pointer;
-      display:flex; align-items:center; justify-content:center;
-      font-size:15px;
-      font-weight:900;
-      gap:10px;
-    }
-    .capture.processing{opacity:.65;pointer-events:none;filter: grayscale(.35);}
-
-    /* Permission screen */
-    .perm{
-      position:fixed; inset:0;
-      display:flex; align-items:center; justify-content:center;
-      padding:22px;
-      background:
-        radial-gradient(1000px 800px at 70% 20%, rgba(11,95,255,.22), transparent 55%),
-        radial-gradient(900px 700px at 20% 70%, rgba(25,195,125,.18), transparent 55%),
-        #070A0E;
-      z-index:100;
-    }
-    .permCard{
-      width: min(420px, 92vw);
-      border-radius: 26px;
-      background: rgba(255,255,255,.06);
-      border: 1px solid var(--hairline);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      padding: 22px;
-      box-shadow: var(--shadow);
-      text-align:center;
-    }
-    .permCard h2{font-size:18px;margin-top:12px;}
-    .permCard p{color: var(--muted); margin-top:10px; line-height:1.7; font-size:14px;}
-    .primaryBtn{
-      margin-top:16px;
-      width:100%;
-      border:none;
-      background: var(--primary);
-      color:#fff;
-      font-weight:900;
-      padding:14px 16px;
-      border-radius:16px;
-      cursor:pointer;
-      box-shadow: 0 18px 35px rgba(11,95,255,.25);
-      font-size:15px;
-    }
-
-    /* Toast */
-    .toast{
-      position:fixed;
-      left:50%;
-      transform: translateX(-50%);
-      bottom: calc(110px + var(--safe-bottom));
-      z-index:300;
-      padding:10px 14px;
-      border-radius:999px;
-      border:1px solid var(--hairline);
-      background: rgba(20,24,28,.72);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      color: var(--text);
-      font-size:13px;
-      display:none;
-      max-width:92vw;
-      text-align:center;
-      box-shadow: 0 16px 50px rgba(0,0,0,.55);
-    }
-    .toast.show{display:block;}
-  </style>
-
-  <!-- OpenCV.js -->
-  <script async src="https://docs.opencv.org/4.x/opencv.js"></script>
+<style>
+body { margin:0; background:#000; color:#fff; font-family:system-ui; }
+#hud {
+  position:fixed; top:16px; left:50%; transform:translateX(-50%);
+  background:rgba(0,0,0,.65);
+  padding:12px 18px;
+  border-radius:14px;
+  z-index:10;
+  text-align:center;
+  max-width:92vw;
+}
+#controls {
+  position:fixed; bottom:18px; left:50%; transform:translateX(-50%);
+  display:flex; gap:10px; z-index:10;
+  flex-wrap:wrap;
+  justify-content:center;
+  width:92vw;
+}
+button {
+  padding:14px 16px;
+  font-size:14px;
+  border-radius:14px;
+  border:none;
+  background:#0B5FFF;
+  color:#fff;
+  font-weight:700;
+  flex:1 1 auto;
+}
+button.secondary { background:#444; }
+</style>
 </head>
 
 <body>
 
-  <div id="perm" class="perm">
-    <div class="permCard">
-      <div style="font-size:64px">📷</div>
-      <h2>الوصول للكاميرا مطلوب</h2>
-      <p>
-        التطبيق سيعرض منصة (Overlay) مختلفة حسب نوع الفحص.
-        لزوايا 45° سيستخدم Computer Vision لاكتشاف خطين وحساب الزاوية.
-      </p>
-      <button class="primaryBtn" id="permBtn">السماح والبدء</button>
-    </div>
-  </div>
+<div id="hud">اختر نوع الفحص ثم اضغط: تثبيت السطح</div>
 
-  <div class="stage" id="stage" style="display:none;">
-    <video id="video" autoplay playsinline muted></video>
-    <canvas id="captureCanvas"></canvas>
-    <canvas id="overlay"></canvas>
+<div id="controls">
+  <button onclick="setMode('angle')">📐 زاوية جدار/أرض</button>
+  <button onclick="setMode('vent')">🌬️ التهوية</button>
+  <button onclick="setMode('trash')">🗑️ النفايات</button>
+  <button onclick="setMode('floor')">⬜ الأرضيات</button>
+  <button class="secondary" onclick="capture()">تثبيت السطح</button>
+</div>
 
-    <div class="topbar">
-      <div class="brand">
-        <div class="logo">م</div>
-        <div class="titleWrap">
-          <div class="title" id="appTitle">ملتزم — كاميرا الفحص</div>
-          <div class="subtitle" id="appSub">Computer Vision — فحص زاوية الجدار/الأرض</div>
-        </div>
-      </div>
-      <div class="topActions">
-        <button class="iconBtn" id="langBtn">🌐 <span id="langLabel">EN</span></button>
-      </div>
-    </div>
+<script type="module">
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.159/build/three.module.js";
 
-    <div class="hint" id="hint">وجّه الكاميرا نحو المنطقة المراد فحصها</div>
+let scene, camera, renderer;
+let xrSession, refSpace, hitTestSource;
+let lastPose = null;
 
-    <div class="cvPill" id="cvPill">
-      <span id="cvDot" class="cvDot"></span>
-      <span id="cvText">جاهز</span>
-      <span id="cvVals" class="cvVals"></span>
-    </div>
+let mode = null;
+let floorNormal = null;
 
-    <div class="sheet">
-      <div class="sheetCard">
-        <div class="types" id="types">
-          <button class="chip active" data-type="4.5">📐 زوايا 45°</button>
-          <button class="chip" data-type="4.7">🌬️ التهوية</button>
-          <button class="chip" data-type="5.8">🗑️ النفايات</button>
-          <button class="chip" data-type="defects">🔧 العيوب</button>
-        </div>
+const hud = document.getElementById("hud");
 
-        <div class="captureRow">
-          <button class="miniBtn" id="switchBtn" title="تبديل الكاميرا">🔄</button>
-          <button class="capture" id="captureBtn">
-            📷 <span id="capLabel">التقاط + تحليل</span>
-          </button>
-          <button class="miniBtn" id="stopBtn" title="إيقاف">⏻</button>
-        </div>
-      </div>
-    </div>
-  </div>
+init().catch(err => {
+  console.error(err);
+  alert("حدث خطأ في تشغيل AR. تأكد أنك تستخدم Chrome على Android وأن الجهاز يدعم ARCore.");
+});
 
-  <div class="toast" id="toast"></div>
+async function init() {
+  if (!navigator.xr) {
+    alert("WebXR غير مدعوم على هذا المتصفح/الجهاز. استخدم Chrome على Android.");
+    return;
+  }
 
-<script>
-/* ===== Fix Mobile VH ===== */
-function setVH(){
-  const vh = window.innerHeight * 0.01;
-  document.documentElement.style.setProperty('--vh', `${vh}px`);
+  scene = new THREE.Scene();
+  camera = new THREE.PerspectiveCamera();
+
+  renderer = new THREE.WebGLRenderer({ alpha:true, antialias:true });
+  renderer.xr.enabled = true;
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  const light = new THREE.HemisphereLight(0xffffff, 0x444444);
+  scene.add(light);
+
+  xrSession = await navigator.xr.requestSession("immersive-ar", {
+    requiredFeatures: ["hit-test"]
+  });
+
+  renderer.xr.setSession(xrSession);
+
+  refSpace = await xrSession.requestReferenceSpace("local");
+  const viewerSpace = await xrSession.requestReferenceSpace("viewer");
+  hitTestSource = await xrSession.requestHitTestSource({ space: viewerSpace });
+
+  renderer.setAnimationLoop(render);
+
+  hud.innerText = "جاهز — اختر نوع الفحص";
 }
-setVH();
-window.addEventListener('resize', setVH);
 
-/* ===== State ===== */
-let stream = null;
-let currentLang = 'ar';
-let selectedType = '4.5';
-let facingMode = 'environment';
-let lastCV = null; // { angleDeg, confidence, hLine, vLine, intersection, map }
+function render(_, frame) {
+  if (!frame) return;
+  const hits = frame.getHitTestResults(hitTestSource);
+  if (hits.length > 0) lastPose = hits[0].getPose(refSpace);
+  renderer.render(scene, camera);
+}
 
-/* ===== i18n ===== */
-const TT = {
-  ar: {
-    appTitle: 'ملتزم — كاميرا الفحص',
-    appSub: 'Computer Vision — فحص زاوية الجدار/الأرض',
-    hint45: 'وجّه الكاميرا نحو زاوية التقاء الجدار بالأرض (الحافة في منتصف الشاشة)',
-    hint47: 'ضع فتحة التهوية داخل المستطيل بالكامل',
-    hint58: 'ضع سلة النفايات داخل الإطار بالكامل',
-    hintDef: 'ضع منطقة العيب داخل المربع وقرّب الكاميرا',
-    cap: 'التقاط + تحليل',
-    lang: 'EN',
-    ready: 'جاهز',
-    working: 'جاري التحليل…',
-    ok: (a)=> `زاوية مكتشفة: ${a.toFixed(1)}°`,
-    fail: 'فشل اكتشاف خطين واضحين — قرّب للحافة وزد الإضاءة'
-  },
-  en: {
-    appTitle: 'Multazim — Inspection Camera',
-    appSub: 'Computer Vision — Wall/Floor Angle',
-    hint45: 'Point at the wall/floor edge (keep the edge centered)',
-    hint47: 'Fit the vent opening inside the rectangle',
-    hint58: 'Fit the bin inside the frame',
-    hintDef: 'Place the defect area inside the square and move closer',
-    cap: 'Capture + Analyze',
-    lang: 'AR',
-    ready: 'Ready',
-    working: 'Analyzing…',
-    ok: (a)=> `Detected angle: ${a.toFixed(1)}°`,
-    fail: 'Could not detect two clear lines — move closer & improve lighting'
+window.setMode = function(m) {
+  mode = m;
+  floorNormal = null;
+
+  if (m === "angle") hud.innerText = "فحص الزاوية: وجّه للأرض واضغط تثبيت السطح";
+  if (m === "vent") hud.innerText = "فحص التهوية: وجّه للجدار قرب فتحة التهوية واضغط تثبيت السطح";
+  if (m === "trash") hud.innerText = "فحص النفايات: وجّه للأرض قرب سلة النفايات واضغط تثبيت السطح";
+  if (m === "floor") hud.innerText = "فحص الأرضيات: وجّه للأرض واضغط تثبيت السطح";
+};
+
+window.capture = function() {
+  if (!lastPose || !mode) {
+    hud.innerText = "اختر نوع الفحص أولاً ثم حاول مرة أخرى";
+    return;
+  }
+
+  const normal = getNormal(lastPose);
+
+  if (mode === "angle") {
+    if (!floorNormal) {
+      floorNormal = normal;
+      hud.innerText = "تم تثبيت الأرض — الآن وجّه للجدار واضغط تثبيت السطح";
+    } else {
+      const angle = angleBetween(floorNormal, normal);
+      hud.innerText = `زاوية الجدار/الأرض ≈ ${angle.toFixed(1)}° (المفترض قريب من 90°)`;
+    }
+  }
+
+  if (mode === "vent") {
+    const verticality = Math.abs(normal.y);
+    hud.innerText = verticality < 0.3 ? "✔️ تم اكتشاف جدار عمودي صالح (للتهوية)" : "❌ السطح غير عمودي — قرّب للجدار";
+  }
+
+  if (mode === "trash") {
+    const horizontality = Math.abs(normal.y);
+    hud.innerText = horizontality > 0.9 ? "✔️ تم اكتشاف أرض أفقية صالحة (سلة النفايات)" : "❌ السطح غير أفقي — وجّه للأرض";
+  }
+
+  if (mode === "floor") {
+    const flatness = Math.abs(normal.y);
+    hud.innerText = flatness > 0.95 ? "✔️ الأرضية مستوية" : "⚠️ الأرضية غير مستوية";
   }
 };
 
-function setTexts(){
-  const L = TT[currentLang];
-  document.documentElement.lang = currentLang;
-  document.documentElement.dir  = currentLang==='ar' ? 'rtl' : 'ltr';
-
-  document.getElementById('appTitle').textContent = L.appTitle;
-  document.getElementById('appSub').textContent   = L.appSub;
-  document.getElementById('capLabel').textContent = L.cap;
-  document.getElementById('langLabel').textContent = L.lang;
-
-  updateHint();
-  setCVState('ready');
+function getNormal(pose) {
+  const q = pose.transform.orientation;
+  const quat = new THREE.Quaternion(q.x, q.y, q.z, q.w);
+  const normal = new THREE.Vector3(0, 1, 0);
+  return normal.applyQuaternion(quat).normalize();
 }
 
-function updateHint(){
-  const L = TT[currentLang];
-  const el = document.getElementById('hint');
-  if(selectedType==='4.5') el.textContent = L.hint45;
-  else if(selectedType==='4.7') el.textContent = L.hint47;
-  else if(selectedType==='5.8') el.textContent = L.hint58;
-  else el.textContent = L.hintDef;
+function angleBetween(a, b) {
+  const dot = THREE.MathUtils.clamp(a.dot(b), -1, 1);
+  return THREE.MathUtils.radToDeg(Math.acos(dot));
 }
 
-/* ===== Toast ===== */
-function toast(msg){
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  setTimeout(()=> el.classList.remove('show'), 2500);
-}
-
-/* ===== CV Pill ===== */
-function setCVState(state, payload){
-  const L = TT[currentLang];
-  const dot = document.getElementById('cvDot');
-  const txt = document.getElementById('cvText');
-  const vals = document.getElementById('cvVals');
-
-  if(state==='ready'){
-    dot.style.background = 'var(--warning)';
-    txt.textContent = L.ready;
-    vals.textContent='';
-  } else if(state==='working'){
-    dot.style.background = 'var(--warning)';
-    txt.textContent = L.working;
-    vals.textContent='';
-  } else if(state==='ok'){
-    dot.style.background = 'var(--accent)';
-    txt.textContent = L.ok(payload.angleDeg);
-    vals.textContent = (currentLang==='ar')
-      ? `ثقة: ${(payload.confidence*100).toFixed(0)}%`
-      : `Conf: ${(payload.confidence*100).toFixed(0)}%`;
-  } else if(state==='fail'){
-    dot.style.background = 'var(--danger)';
-    txt.textContent = L.fail;
-    vals.textContent='';
-  }
-}
-
-/* ===== Camera ===== */
-async function startCamera(){
-  stopCamera();
-  try{
-    stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode, width:{ideal:1280}, height:{ideal:720} },
-      audio:false
-    });
-    const video = document.getElementById('video');
-    video.srcObject = stream;
-
-    document.getElementById('perm').style.display = 'none';
-    document.getElementById('stage').style.display = 'block';
-
-    await video.play();
-    resizeOverlay();
-    drawOverlayLoop();
-  }catch(e){
-    console.error(e);
-    toast(currentLang==='ar' ? 'فشل تشغيل الكاميرا' : 'Camera start failed');
-  }
-}
-function stopCamera(){
-  if(stream){
-    stream.getTracks().forEach(t=>t.stop());
-    stream=null;
-  }
-}
-document.getElementById('permBtn').addEventListener('click', startCamera);
-
-/* ===== Overlay ===== */
-let rafId=null;
-function resizeOverlay(){
-  const overlay = document.getElementById('overlay');
-  const rect = overlay.getBoundingClientRect();
-  overlay.width = Math.floor(rect.width * devicePixelRatio);
-  overlay.height = Math.floor(rect.height * devicePixelRatio);
-}
-window.addEventListener('resize', ()=>{ setVH(); resizeOverlay(); });
-
-function drawOverlayLoop(){
-  const overlay = document.getElementById('overlay');
-  const ctx = overlay.getContext('2d');
-
-  const loop=()=>{
-    ctx.clearRect(0,0,overlay.width, overlay.height);
-
-    // Draw platform based on selected type
-    drawPlatform(ctx, selectedType);
-
-    // If CV result exists and type is 4.5, draw geometry
-    if(selectedType==='4.5' && lastCV && lastCV.hLine && lastCV.vLine && lastCV.intersection){
-      drawDetectedGeometry(ctx, lastCV);
-    }
-
-    rafId = requestAnimationFrame(loop);
-  };
-  loop();
-}
-
-function drawPlatform(ctx, type){
-  const w = ctx.canvas.width;
-  const h = ctx.canvas.height;
-  const cx = w/2, cy = h/2;
-
-  // منطقة عمل وسط الشاشة (تجنّب تغطية شريط الأسفل)
-  const topSafe = (170 + (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--safe-top'))||0)) * devicePixelRatio;
-  const bottomSafe = (210 + (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--safe-bottom'))||0)) * devicePixelRatio;
-
-  const usableTop = topSafe;
-  const usableBottom = h - bottomSafe;
-  const usableH = Math.max(200, usableBottom - usableTop);
-  const uy = usableTop + usableH/2;
-
-  ctx.save();
-  ctx.shadowColor='rgba(0,0,0,.55)';
-  ctx.shadowBlur=10;
-
-  if(type==='4.5'){
-    // إطار مستطيل + خطوط مركزية
-    const rw = w*0.72, rh = usableH*0.42;
-    strokeRoundRect(ctx, cx-rw/2, uy-rh/2, rw, rh, 28, 'rgba(11,95,255,.28)', 3);
-
-    ctx.strokeStyle='rgba(25,195,125,.20)';
-    ctx.lineWidth=2;
-    ctx.beginPath();
-    ctx.moveTo(cx, uy-rh/2); ctx.lineTo(cx, uy+rh/2);
-    ctx.moveTo(cx-rw/2, uy); ctx.lineTo(cx+rw/2, uy);
-    ctx.stroke();
-  }
-  else if(type==='4.7'){
-    // منصة التهوية: مستطيل عريض
-    const rw = w*0.78, rh = usableH*0.30;
-    strokeRoundRect(ctx, cx-rw/2, uy-rh/2, rw, rh, 24, 'rgba(25,195,125,.85)', 4);
-
-    // زوايا داخلية تساعد المحاذاة
-    cornerMarks(ctx, cx-rw/2, uy-rh/2, rw, rh, 28, 'rgba(245,247,250,.75)');
-  }
-  else if(type==='5.8'){
-    // منصة النفايات: مستطيل أقرب للمربع (أو يمكن دائرة)
-    const s = Math.min(w*0.62, usableH*0.52);
-    strokeRoundRect(ctx, cx-s/2, uy-s/2, s, s, 26, 'rgba(245,158,11,.90)', 4);
-    cornerMarks(ctx, cx-s/2, uy-s/2, s, s, 26, 'rgba(245,247,250,.75)');
-  }
-  else {
-    // العيوب: مربع + شبكة خفيفة
-    const s = Math.min(w*0.70, usableH*0.58);
-    strokeRoundRect(ctx, cx-s/2, uy-s/2, s, s, 26, 'rgba(11,95,255,.85)', 4);
-
-    ctx.strokeStyle='rgba(11,95,255,.18)';
-    ctx.lineWidth=2;
-    for(let i=1;i<4;i++){
-      ctx.beginPath();
-      ctx.moveTo(cx-s/2 + s*i/4, uy-s/2);
-      ctx.lineTo(cx-s/2 + s*i/4, uy+s/2);
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.moveTo(cx-s/2, uy-s/2 + s*i/4);
-      ctx.lineTo(cx+s/2, uy-s/2 + s*i/4);
-      ctx.stroke();
-    }
-  }
-  ctx.restore();
-}
-
-function strokeRoundRect(ctx, x,y,w,h,r,stroke, lw){
-  ctx.strokeStyle = stroke;
-  ctx.lineWidth = lw;
-  ctx.beginPath();
-  roundRect(ctx, x,y,w,h,r);
-  ctx.stroke();
-}
-function roundRect(ctx, x, y, w, h, r){
-  const rr = Math.min(r, w/2, h/2);
-  ctx.moveTo(x+rr, y);
-  ctx.arcTo(x+w, y, x+w, y+h, rr);
-  ctx.arcTo(x+w, y+h, x, y+h, rr);
-  ctx.arcTo(x, y+h, x, y, rr);
-  ctx.arcTo(x, y, x+w, y, rr);
-}
-function cornerMarks(ctx, x,y,w,h, len, color){
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  // TL
-  ctx.moveTo(x, y+len); ctx.lineTo(x, y); ctx.lineTo(x+len, y);
-  // TR
-  ctx.moveTo(x+w-len, y); ctx.lineTo(x+w, y); ctx.lineTo(x+w, y+len);
-  // BL
-  ctx.moveTo(x, y+h-len); ctx.lineTo(x, y+h); ctx.lineTo(x+len, y+h);
-  // BR
-  ctx.moveTo(x+w-len, y+h); ctx.lineTo(x+w, y+h); ctx.lineTo(x+w, y+h-len);
-  ctx.stroke();
-}
-
-function drawDetectedGeometry(ctx, cvRes){
-  const map = cvRes.map;
-  if(!map) return;
-
-  const toO = (pt)=> ({ x: pt.x * map.sx, y: pt.y * map.sy });
-
-  const h1 = toO(cvRes.hLine.p1), h2 = toO(cvRes.hLine.p2);
-  const v1 = toO(cvRes.vLine.p1), v2 = toO(cvRes.vLine.p2);
-  const I  = toO(cvRes.intersection);
-
-  ctx.save();
-  ctx.lineWidth = 6;
-  ctx.lineCap = 'round';
-  ctx.shadowColor = 'rgba(0,0,0,.6)';
-  ctx.shadowBlur = 10;
-
-  ctx.strokeStyle = 'rgba(25,195,125,.95)';
-  ctx.beginPath(); ctx.moveTo(h1.x,h1.y); ctx.lineTo(h2.x,h2.y); ctx.stroke();
-
-  ctx.strokeStyle = 'rgba(11,95,255,.95)';
-  ctx.beginPath(); ctx.moveTo(v1.x,v1.y); ctx.lineTo(v2.x,v2.y); ctx.stroke();
-
-  ctx.fillStyle = 'rgba(245,247,250,.95)';
-  ctx.beginPath(); ctx.arc(I.x, I.y, 7, 0, Math.PI*2); ctx.fill();
-
-  ctx.shadowBlur = 0;
-  ctx.fillStyle = 'rgba(245,247,250,.95)';
-  ctx.font = '900 28px system-ui, Arial';
-  ctx.textAlign = 'center';
-  ctx.fillText(cvRes.angleDeg.toFixed(1) + '°', I.x, I.y - 16);
-  ctx.restore();
-}
-
-/* ===== OpenCV CV detect (only for 4.5) ===== */
-function ensureCVReady(){
-  return new Promise((resolve, reject)=>{
-    const t0 = Date.now();
-    const tick = ()=>{
-      if(typeof cv !== 'undefined' && cv.Mat){
-        resolve(true); return;
-      }
-      if(Date.now()-t0>8000) return reject(new Error("OpenCV timeout"));
-      requestAnimationFrame(tick);
-    };
-    tick();
-  });
-}
-
-function captureFrameToCanvas(){
-  const video = document.getElementById('video');
-  const canvas = document.getElementById('captureCanvas');
-  const ctx = canvas.getContext('2d');
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-  ctx.drawImage(video,0,0);
-  return canvas;
-}
-function clamp(x,a,b){ return Math.max(a, Math.min(b,x)); }
-function direction(p1,p2){
-  const dx=p2.x-p1.x, dy=p2.y-p1.y;
-  const n=Math.hypot(dx,dy)||1;
-  return {x:dx/n,y:dy/n};
-}
-function angleBetween(u,v){
-  const dot= u.x*v.x + u.y*v.y;
-  return Math.acos(clamp(dot,-1,1))*180/Math.PI;
-}
-function lineIntersection(a,b,c,d){
-  const A1=b.y-a.y, B1=a.x-b.x, C1=A1*a.x + B1*a.y;
-  const A2=d.y-c.y, B2=c.x-d.x, C2=A2*c.x + B2*c.y;
-  const det=A1*B2 - A2*B1;
-  if(Math.abs(det)<1e-6) return null;
-  return { x:(B2*C1 - B1*C2)/det, y:(A1*C2 - A2*C1)/det };
-}
-
-function detectWallFloorAngle(canvas){
-  const src = cv.imread(canvas);
-  const w = src.cols, h = src.rows;
-
-  const gray = new cv.Mat();
-  cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
-
-  const blur = new cv.Mat();
-  cv.GaussianBlur(gray, blur, new cv.Size(5,5), 0);
-
-  const edges = new cv.Mat();
-  cv.Canny(blur, edges, 50, 140);
-
-  const lines = new cv.Mat();
-  cv.HoughLinesP(edges, lines, 1, Math.PI/180, 70, Math.min(w,h)*0.25, 18);
-
-  const candidates=[];
-  for(let i=0;i<lines.rows;i++){
-    const x1=lines.data32S[i*4+0], y1=lines.data32S[i*4+1];
-    const x2=lines.data32S[i*4+2], y2=lines.data32S[i*4+3];
-    const dx=x2-x1, dy=y2-y1;
-    const len=Math.hypot(dx,dy);
-    if(len < Math.min(w,h)*0.25) continue;
-    let ang=Math.atan2(dy,dx)*180/Math.PI;
-    if(ang<0) ang+=180;
-    const score=len;
-    candidates.push({p1:{x:x1,y:y1}, p2:{x:x2,y:y2}, len, ang, score});
-  }
-
-  const H=candidates.filter(c=>c.ang<=18 || c.ang>=162).sort((a,b)=>b.score-a.score);
-  const V=candidates.filter(c=>c.ang>=72 && c.ang<=108).sort((a,b)=>b.score-a.score);
-
-  src.delete(); gray.delete(); blur.delete(); edges.delete(); lines.delete();
-
-  if(!H.length || !V.length) return null;
-  const hLine=H[0], vLine=V[0];
-  const inter=lineIntersection(hLine.p1,hLine.p2, vLine.p1, vLine.p2);
-  if(!inter) return null;
-
-  const u=direction(hLine.p1,hLine.p2);
-  const v=direction(vLine.p1,vLine.p2);
-  let angle=angleBetween(u,v);
-  angle=Math.min(angle, 180-angle);
-
-  const conf=clamp(0.45 + 0.35*((hLine.len+vLine.len)/(Math.min(w,h)*1.2)) + 0.15*clamp(candidates.length/40,0,1), 0, 0.98);
-
-  return { angleDeg: angle, confidence: conf,
-    hLine:{p1:hLine.p1,p2:hLine.p2,len:hLine.len,ang:hLine.ang},
-    vLine:{p1:vLine.p1,p2:vLine.p2,len:vLine.len,ang:vLine.ang},
-    intersection: inter,
-    rawCount: candidates.length
-  };
-}
-
-/* ===== Actions ===== */
-document.getElementById('captureBtn').addEventListener('click', async ()=>{
-  const btn = document.getElementById('captureBtn');
-  btn.classList.add('processing');
-  lastCV=null;
-
-  try{
-    // For non-45 types: just capture (no CV for now) + show toast
-    if(selectedType !== '4.5'){
-      setCVState('ready');
-      toast(currentLang==='ar'
-        ? 'تم الالتقاط — منصة التوجيه ظاهرة لهذا النوع'
-        : 'Captured — guidance frame shown for this type');
-      btn.classList.remove('processing');
-      return;
-    }
-
-    setCVState('working');
-    await ensureCVReady();
-
-    const canvas = captureFrameToCanvas();
-    const result = detectWallFloorAngle(canvas);
-
-    if(result){
-      const overlay = document.getElementById('overlay');
-      result.map = { sx: overlay.width / canvas.width, sy: overlay.height / canvas.height };
-      lastCV = result;
-      setCVState('ok', result);
-    }else{
-      setCVState('fail');
-    }
-
-  }catch(e){
-    console.error(e);
-    setCVState('fail');
-  }finally{
-    btn.classList.remove('processing');
-  }
+window.addEventListener("resize", () => {
+  renderer?.setSize(window.innerWidth, window.innerHeight);
 });
-
-document.getElementById('switchBtn').addEventListener('click', async ()=>{
-  facingMode = (facingMode==='environment') ? 'user' : 'environment';
-  lastCV=null;
-  await startCamera();
-});
-
-document.getElementById('stopBtn').addEventListener('click', ()=>{
-  stopCamera();
-  document.getElementById('stage').style.display='none';
-  document.getElementById('perm').style.display='flex';
-});
-
-document.getElementById('langBtn').addEventListener('click', ()=>{
-  currentLang = (currentLang==='ar') ? 'en' : 'ar';
-  setTexts();
-});
-
-document.getElementById('types').addEventListener('click', (e)=>{
-  const b = e.target.closest('.chip');
-  if(!b) return;
-  selectedType = b.dataset.type;
-  document.querySelectorAll('.chip').forEach(x=> x.classList.toggle('active', x.dataset.type===selectedType));
-  lastCV=null;
-  updateHint();
-  setCVState('ready');
-});
-
-/* ===== Init ===== */
-setTexts();
 </script>
 
 </body>
