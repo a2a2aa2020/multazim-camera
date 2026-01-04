@@ -15,7 +15,7 @@
       --muted: rgba(245,247,250,.72);
 
       --primary: #0B5FFF;   /* حكومي أزرق */
-      --accent: #19C37D;    /* أخضر التزام/نجاح */
+      --accent: #19C37D;    /* أخضر الالتزام */
       --warning: #F59E0B;
       --danger: #EF4444;
 
@@ -51,7 +51,7 @@
       position:absolute; inset:0;
       width:100%; height:100%;
       object-fit: cover;
-      transform: scaleX(1); /* لو احتجت mirror للكاميرا الأمامية غيّرها */
+      transform: scaleX(1);
     }
 
     #captureCanvas{ display:none; }
@@ -142,6 +142,31 @@
       text-align:center;
     }
 
+    /* Level pill */
+    .levelPill{
+      position:absolute;
+      top: calc(128px + var(--safe-top));
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--hairline);
+      background: rgba(20,24,28,.62);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      font-weight: 900;
+      font-size: 13px;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      box-shadow: 0 10px 35px rgba(0,0,0,.45);
+      max-width: 92vw;
+      justify-content:center;
+    }
+    .levelDot{ width:10px;height:10px;border-radius:999px;background: var(--warning); }
+    .levelVals{ color: var(--muted); font-weight:800; }
+
     /* Bottom sheet */
     .sheet{
       position:absolute;
@@ -220,6 +245,7 @@
       cursor:pointer;
       display:flex; align-items:center; justify-content:center;
       font-size: 26px;
+      transition: opacity .2s ease;
     }
     .capture.processing{ opacity:.65; pointer-events:none; filter: grayscale(.35); }
     .capture:active{ transform: scale(.98); }
@@ -383,6 +409,9 @@
     }
     .toast.show{ display:block; }
   </style>
+
+  <!-- EmailJS (للتجربة الآن) -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 
 <body>
@@ -391,9 +420,11 @@
   <div id="perm" class="perm">
     <div class="permCard">
       <div style="font-size:64px">📷</div>
-      <h2 id="permTitle">الوصول للكاميرا مطلوب</h2>
-      <p id="permDesc">تستخدم هذه الخدمة الكاميرا لإجراء فحص ميداني وفق ضوابط الجهة، دون حفظ الصور محليًا إلا عند الطلب.</p>
-      <button class="primaryBtn" id="permBtn">السماح بالوصول</button>
+      <h2 id="permTitle">الوصول للكاميرا والحساسات مطلوب</h2>
+      <p id="permDesc">
+        تستخدم هذه الخدمة الكاميرا لإجراء فحص ميداني، وتستخدم حساسات الجهاز (Pitch/Roll) لتثبيت وضعية الهاتف وتحسين دقة الفحص.
+      </p>
+      <button class="primaryBtn" id="permBtn">السماح والبدء</button>
       <p style="margin-top:12px; font-size:12px; color: var(--muted);">
         سيتم تشغيل الكاميرا فقط أثناء استخدام الشاشة.
       </p>
@@ -423,6 +454,13 @@
     </div>
 
     <div class="hint" id="hint">وجّه الكاميرا نحو المنطقة المراد فحصها</div>
+
+    <!-- Level indicator -->
+    <div id="levelPill" class="levelPill">
+      <span id="levelDot" class="levelDot"></span>
+      <span id="levelText">ثبّت الهاتف ليصبح مستويًا (±2°)</span>
+      <span id="levelVals" class="levelVals"></span>
+    </div>
 
     <div class="sheet">
       <div class="sheetCard">
@@ -474,6 +512,20 @@
   <div class="toast" id="toast"></div>
 
 <script>
+  // ===========================
+  //  EmailJS إعدادات (عدّلها)
+  // ===========================
+  const EMAILJS_PUBLIC_KEY = "PUT_YOUR_PUBLIC_KEY_HERE";
+  const EMAILJS_SERVICE_ID = "PUT_YOUR_SERVICE_ID_HERE";
+  const EMAILJS_TEMPLATE_ID = "PUT_YOUR_TEMPLATE_ID_HERE";
+
+  // بريد الاستلام ثابت حسب طلبك
+  const EMAIL_TO = "a.alamm@datainsight.com.sa";
+
+  // تهيئة EmailJS
+  // ملاحظة: ضع مفاتيحك الحقيقية قبل التجربة
+  emailjs.init(EMAILJS_PUBLIC_KEY);
+
   // ===== State =====
   let stream = null;
   let currentLang = 'ar';
@@ -481,34 +533,43 @@
   let facingMode = 'environment'; // or 'user'
   let lastBlob = null;
 
-  const t = {
+  // ===== Level / Sensors =====
+  let lastPitch = null;
+  let lastRoll = null;
+  let isLevel = false;
+  const LEVEL_TOL_DEG = 2; // ±2°
+
+  // ===== Translations =====
+  const TT = {
     ar: {
       appTitle: 'ملتزم — كاميرا الفحص',
       appSub: 'خدمة فحص ميداني — نسخة تجريبية',
       hint: 'وجّه الكاميرا نحو المنطقة المراد فحصها',
-      permTitle: 'الوصول للكاميرا مطلوب',
-      permDesc: 'تستخدم هذه الخدمة الكاميرا لإجراء فحص ميداني وفق ضوابط الجهة، دون حفظ الصور محليًا إلا عند الطلب.',
-      permBtn: 'السماح بالوصول',
       modalTitle: 'نتيجة الفحص',
-      rule: (x)=> x==='defects' ? 'فحص العيوب' : `القاعدة ${x}`,
       retry: 'إعادة التحليل',
       newScan: 'فحص جديد',
       close: 'إغلاق ✕',
       lang: 'EN',
+      rule: (x)=> x==='defects' ? 'فحص العيوب' : `القاعدة ${x}`,
+      levelHold: (tol)=> `ثبّت الهاتف ليصبح مستويًا (±${tol}°)`,
+      levelOk: '✅ الجهاز مستوٍ — يمكنك الالتقاط',
+      emailSent: 'تم إرسال نتيجة الفحص بالبريد ✅',
+      emailFail: 'تعذر إرسال البريد. تأكد من إعداد EmailJS.',
     },
     en: {
       appTitle: 'Multazim — Inspection Camera',
       appSub: 'Field inspection service — Beta',
       hint: 'Point the camera at the area to inspect',
-      permTitle: 'Camera access required',
-      permDesc: 'This service uses the camera to perform on-site checks under agency policies. Images are not stored unless requested.',
-      permBtn: 'Allow access',
       modalTitle: 'Inspection Result',
-      rule: (x)=> x==='defects' ? 'Defects Scan' : `Rule ${x}`,
       retry: 'Retry',
       newScan: 'New Scan',
       close: 'Close ✕',
       lang: 'AR',
+      rule: (x)=> x==='defects' ? 'Defects Scan' : `Rule ${x}`,
+      levelHold: (tol)=> `Hold device level (±${tol}°)`,
+      levelOk: '✅ Level — You can capture',
+      emailSent: 'Result emailed ✅',
+      emailFail: 'Email failed. Check EmailJS setup.',
     }
   };
 
@@ -521,17 +582,13 @@
   }
 
   function setTexts(){
-    const L = t[currentLang];
+    const L = TT[currentLang];
     document.documentElement.lang = currentLang;
     document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
 
     document.getElementById('appTitle').textContent = L.appTitle;
     document.getElementById('appSub').textContent = L.appSub;
     document.getElementById('hint').textContent = L.hint;
-
-    document.getElementById('permTitle').textContent = L.permTitle;
-    document.getElementById('permDesc').textContent = L.permDesc;
-    document.getElementById('permBtn').textContent = L.permBtn;
 
     document.getElementById('modalTitle').textContent = L.modalTitle;
     document.getElementById('retryBtn').textContent = L.retry;
@@ -540,8 +597,86 @@
     document.getElementById('langLabel').textContent = L.lang;
 
     document.getElementById('ruleLabel').textContent = L.rule(selectedType);
+
+    // تحديث نص مؤشر المستوى حسب الحالة الحالية
+    const levelText = document.getElementById('levelText');
+    levelText.textContent = isLevel ? L.levelOk : L.levelHold(LEVEL_TOL_DEG);
   }
 
+  function disableCapture(){
+    const captureBtn = document.getElementById('captureBtn');
+    captureBtn.style.opacity = '.55';
+    captureBtn.style.pointerEvents = 'none';
+  }
+
+  function enableCapture(){
+    const captureBtn = document.getElementById('captureBtn');
+    captureBtn.style.opacity = '1';
+    captureBtn.style.pointerEvents = 'auto';
+  }
+
+  // ===== Sensors =====
+  function updateLevelUI(pitch, roll){
+    const dot = document.getElementById('levelDot');
+    const text = document.getElementById('levelText');
+    const vals = document.getElementById('levelVals');
+    const L = TT[currentLang];
+
+    const p = Math.round(pitch * 10) / 10;
+    const r = Math.round(roll * 10) / 10;
+
+    vals.textContent = `P:${p}°  R:${r}°`;
+
+    isLevel = (Math.abs(pitch) <= LEVEL_TOL_DEG) && (Math.abs(roll) <= LEVEL_TOL_DEG);
+
+    if(isLevel){
+      dot.style.background = 'var(--accent)';
+      text.textContent = L.levelOk;
+      enableCapture();
+    } else {
+      dot.style.background = 'var(--warning)';
+      text.textContent = L.levelHold(LEVEL_TOL_DEG);
+      disableCapture();
+    }
+  }
+
+  function handleOrientation(e){
+    const pitch = (typeof e.beta === 'number') ? e.beta : 0;   // front-back
+    const roll  = (typeof e.gamma === 'number') ? e.gamma : 0; // left-right
+    lastPitch = pitch;
+    lastRoll = roll;
+    updateLevelUI(pitch, roll);
+  }
+
+  async function enableSensors(){
+    try{
+      if(typeof DeviceOrientationEvent !== 'undefined' &&
+         typeof DeviceOrientationEvent.requestPermission === 'function'){
+        const res = await DeviceOrientationEvent.requestPermission();
+        if(res !== 'granted'){
+          toast(currentLang==='ar' ? 'تم رفض إذن الحساسات.' : 'Sensor permission denied.');
+          disableCapture(); // بدون حساسات نخلي الالتقاط مقفول
+          return false;
+        }
+      }
+      window.addEventListener('deviceorientation', handleOrientation, true);
+      return true;
+    }catch(err){
+      console.error(err);
+      toast(currentLang==='ar' ? 'تعذّر تفعيل الحساسات.' : 'Failed to enable sensors.');
+      disableCapture();
+      return false;
+    }
+  }
+
+  function removeSensors(){
+    window.removeEventListener('deviceorientation', handleOrientation, true);
+    lastPitch = null;
+    lastRoll = null;
+    isLevel = false;
+  }
+
+  // ===== Camera =====
   async function startCamera(){
     stopCamera(); // ensure no double streams
     try{
@@ -557,12 +692,18 @@
       document.getElementById('stage').style.display = 'block';
 
       await video.play();
+
+      // Overlay loop
       resizeOverlay();
       drawLoop();
 
+      // Sensors (بعد ضغط المستخدم زر السماح — مناسب لـ iOS)
+      disableCapture();          // نقفل الالتقاط مبدئياً
+      await enableSensors();     // سيفتح الالتقاط فقط عند الاستواء
+
     }catch(e){
       toast(currentLang==='ar'
-        ? 'تعذّر تشغيل الكاميرا. تأكد من منح الإذن.'
+        ? 'فشل تشغيل الكاميرا. تأكد من منح الإذن.'
         : 'Unable to start camera. Please grant permission.'
       );
       console.error(e);
@@ -576,9 +717,9 @@
     }
   }
 
+  // ===== Overlay drawing =====
   function resizeOverlay(){
     const overlay = document.getElementById('overlay');
-    // Make canvas match CSS pixels
     const rect = overlay.getBoundingClientRect();
     overlay.width = Math.floor(rect.width * devicePixelRatio);
     overlay.height = Math.floor(rect.height * devicePixelRatio);
@@ -590,11 +731,7 @@
     const cx = w/2, cy = h/2;
 
     ctx.clearRect(0,0,w,h);
-    ctx.save();
-    ctx.scale(devicePixelRatio, devicePixelRatio); // we already used DPR in canvas size; optional safeguard
-    ctx.restore();
 
-    // draw in actual canvas pixels
     ctx.strokeStyle = 'rgba(11,95,255,.95)';
     ctx.lineWidth = 4;
     ctx.shadowColor = 'rgba(0,0,0,.55)';
@@ -666,7 +803,14 @@
     setTexts();
   }
 
+  // ===== Capture & Analyze (محاكاة) =====
   async function capture(){
+    // قفل نهائي: حتى لو UI مفتوح بالخطأ
+    if(!isLevel){
+      toast(currentLang==='ar' ? 'ثبّت الهاتف أولاً حتى يصبح مستويًا.' : 'Hold device level first.');
+      return;
+    }
+
     const btn = document.getElementById('captureBtn');
     btn.classList.add('processing');
 
@@ -679,20 +823,24 @@
       canvas.height = video.videoHeight;
       ctx.drawImage(video, 0, 0);
 
-      // Blob بدل Base64 (أفضل للموبايل والـAPI)
       lastBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.86));
-
-      // preview
       const url = URL.createObjectURL(lastBlob);
       document.getElementById('preview').src = url;
 
       openModalLoading();
-      // هنا مكان التحليل الحقيقي:
-      // const result = await analyzeViaAPI(lastBlob, selectedType);
-      // showResult(result);
+      setTimeout(async ()=>{
+        const result = mockResult();
+        showResult(result);
 
-      // حاليا: محاكاة سريعة
-      setTimeout(()=> showResult(mockResult()), 900);
+        // إرسال بريد بالنتيجة بعد كل فحص
+        try{
+          await sendResultEmail(result);
+          toast(TT[currentLang].emailSent);
+        }catch(err){
+          console.error(err);
+          toast(TT[currentLang].emailFail);
+        }
+      }, 900);
 
     }catch(e){
       toast(currentLang==='ar' ? 'فشل التقاط الصورة.' : 'Capture failed.');
@@ -703,7 +851,7 @@
   }
 
   function openModalLoading(){
-    const L = t[currentLang];
+    const L = TT[currentLang];
     document.getElementById('modal').classList.add('active');
     document.getElementById('badge').className = 'badge maybe';
     document.getElementById('badge').textContent = currentLang==='ar' ? '⏳ جاري التحليل' : '⏳ Analyzing';
@@ -751,7 +899,7 @@
       'non-compliant': { cls:'no', color:'linear-gradient(90deg, rgba(239,68,68,.95), rgba(245,158,11,.55))',
         labelAr:'✕ غير مطابق', labelEn:'✕ Non-Compliant' },
       uncertain: { cls:'maybe', color:'linear-gradient(90deg, rgba(245,158,11,.95), rgba(11,95,255,.55))',
-        labelAr:'؟ غير مؤكد', labelEn:'؟ Uncertain' }
+        labelAr:'؟ غير مؤكد', labelEn:'？ Uncertain' }
     };
 
     const m = map[r.status];
@@ -768,15 +916,32 @@
     msg.textContent = (currentLang==='ar') ? r.msgAr : r.msgEn;
   }
 
-  // مثال جاهز لربط API حقيقي
-  async function analyzeViaAPI(imageBlob, ruleType){
-    const form = new FormData();
-    form.append('image', imageBlob, 'capture.jpg');
-    form.append('rule', ruleType);
+  // ===== EmailJS: إرسال نتيجة الفحص =====
+  async function sendResultEmail(result){
+    // حماية: إذا لم تُعدّل مفاتيح EmailJS، لا نحاول الإرسال
+    if(!EMAILJS_PUBLIC_KEY || EMAILJS_PUBLIC_KEY.includes("PUT_") ||
+       !EMAILJS_SERVICE_ID || EMAILJS_SERVICE_ID.includes("PUT_") ||
+       !EMAILJS_TEMPLATE_ID || EMAILJS_TEMPLATE_ID.includes("PUT_")){
+      throw new Error("EmailJS keys not set");
+    }
 
-    const res = await fetch('/api/inspect', { method:'POST', body: form });
-    if(!res.ok) throw new Error('API failed');
-    return await res.json();
+    const L = TT[currentLang];
+    const ts = new Date();
+    const payload = {
+      to_email: EMAIL_TO,
+      rule: L.rule(selectedType),
+      rule_code: selectedType,
+      status: result.status,
+      confidence: result.confidence + '%',
+      message: (currentLang==='ar') ? result.msgAr : result.msgEn,
+      pitch: (typeof lastPitch === 'number') ? lastPitch.toFixed(2) + '°' : 'N/A',
+      roll: (typeof lastRoll === 'number') ? lastRoll.toFixed(2) + '°' : 'N/A',
+      timestamp: ts.toLocaleString(),
+      lang: currentLang.toUpperCase()
+    };
+
+    // إرسال عبر EmailJS Template Variables
+    return emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, payload);
   }
 
   // ===== Events =====
@@ -785,6 +950,10 @@
   document.getElementById('langBtn').addEventListener('click', ()=>{
     currentLang = (currentLang==='ar') ? 'en' : 'ar';
     setTexts();
+    // إعادة تحديث مؤشر المستوى فوراً عند تغيير اللغة
+    if(typeof lastPitch === 'number' && typeof lastRoll === 'number'){
+      updateLevelUI(lastPitch, lastRoll);
+    }
   });
 
   document.getElementById('types').addEventListener('click', (e)=>{
@@ -797,7 +966,17 @@
 
   document.getElementById('retryBtn').addEventListener('click', ()=>{
     openModalLoading();
-    setTimeout(()=> showResult(mockResult()), 800);
+    setTimeout(async ()=>{
+      const result = mockResult();
+      showResult(result);
+      try{
+        await sendResultEmail(result);
+        toast(TT[currentLang].emailSent);
+      }catch(err){
+        console.error(err);
+        toast(TT[currentLang].emailFail);
+      }
+    }, 800);
   });
 
   document.getElementById('newBtn').addEventListener('click', closeModal);
@@ -806,8 +985,10 @@
   document.getElementById('stopBtn').addEventListener('click', ()=>{
     stopOverlayLoop();
     stopCamera();
+    removeSensors();
     document.getElementById('stage').style.display = 'none';
     document.getElementById('perm').style.display = 'flex';
+    disableCapture();
     toast(currentLang==='ar' ? 'تم إيقاف الكاميرا.' : 'Camera stopped.');
   });
 
@@ -817,14 +998,16 @@
       ? (facingMode==='environment' ? 'الكاميرا الخلفية' : 'الكاميرا الأمامية')
       : (facingMode==='environment' ? 'Rear camera' : 'Front camera')
     );
+    removeSensors();
     await startCamera();
   });
 
   window.addEventListener('resize', resizeOverlay);
 
   // init
+  disableCapture();
   setTexts();
 </script>
+
 </body>
 </html>
-Add index.html
