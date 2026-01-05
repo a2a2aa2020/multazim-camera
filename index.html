@@ -2,191 +2,195 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>نظام ملتزم - النسخة المتقدمة</title>
-    <style>
-        :root { 
-            --primary: #27AE60; /* تغيير اللون الأساسي للأخضر */
-            --success: #27AE60; --danger: #E74C3C; 
-            --bg: #FFFFFF; --safe-top: env(safe-area-inset-top); 
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
-        body { background: white; color: #1E293B; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
-        
-        .screen { display: none; flex-direction: column; height: 100%; width: 100%; padding: 20px; padding-top: calc(var(--safe-top) + 20px); background: white; overflow-y: auto; }
-        .active-screen { display: flex; }
-
-        /* شعار أخضر */
-        .brand-green { color: var(--success); font-size: 60px; margin-bottom: 10px; }
-        
-        .room-entry { background: #F8FAFC; padding: 15px; border-radius: 12px; border: 1px solid #E2E8F0; margin-bottom: 15px; }
-        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .input-grid input { padding: 8px; border: 1px solid #CBD5E1; border-radius: 6px; width: 100%; }
-        
-        #inspectionScreen { padding: 10px; overflow: hidden; }
-        .camera-container { position: relative; flex: 1; background: #000; border-radius: 20px; overflow: hidden; margin: 10px 0; }
-        #video { width: 100%; height: 100%; object-fit: cover; }
-        #overlay { position: absolute; inset: 0; pointer-events: none; z-index: 10; width: 100%; height: 100%; }
-
-        /* أدوات التحكم في القوس */
-        .arc-controls { position: absolute; bottom: 10px; right: 10px; left: 10px; z-index: 20; display: none; gap: 10px; align-items: center; background: rgba(255,255,255,0.8); padding: 10px; border-radius: 12px; }
-
-        .btn { padding: 16px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; font-size: 16px; width: 100%; }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-add { background: #F1F5F9; color: #1E293B; margin-bottom: 10px; border: 1px dashed #CBD5E1; }
-        
-        .violation-card { border: 2px solid var(--danger); border-radius: 15px; padding: 15px; margin-bottom: 15px; background: #FFF5F5; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام ملتزم الذكي - الفحص الذاتي للمطاعم</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- شاشة البداية -->
+    <div id="homeScreen" class="screen active">
+        <div class="container">
+            <div class="header-section">
+                <div class="logo">
+                    <svg width="80" height="80" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M50 10L20 30V70L50 90L80 70V30L50 10Z" stroke="url(#gradient)" stroke-width="3" fill="url(#gradient-fill)"/>
+                        <circle cx="50" cy="50" r="15" fill="white"/>
+                        <path d="M45 50L48 53L55 46" stroke="#2563eb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                        <defs>
+                            <linearGradient id="gradient" x1="20" y1="10" x2="80" y2="90">
+                                <stop offset="0%" stop-color="#3b82f6"/>
+                                <stop offset="100%" stop-color="#2563eb"/>
+                            </linearGradient>
+                            <linearGradient id="gradient-fill" x1="20" y1="10" x2="80" y2="90">
+                                <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.1"/>
+                                <stop offset="100%" stop-color="#2563eb" stop-opacity="0.2"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <h1 class="main-title">نظام ملتزم الذكي</h1>
+                <p class="subtitle">نظام الفحص الذاتي بالذكاء الاصطناعي</p>
+                <div class="badge">للمطاعم والمنشآت الغذائية</div>
+            </div>
 
-    <div id="setupScreen" class="screen active-screen">
-        <div style="text-align: center; margin-bottom: 20px;">
-            <div class="brand-green">🛡️</div>
-            <h2 style="color: var(--success);">نظام ملتزم الذكي</h2>
-            <p style="color: #64748B;">التقييم الرقابي للمنشآت</p>
-        </div>
+            <div class="info-card">
+                <h2>معايير الفحص التلقائية</h2>
+                <div class="criteria-grid">
+                    <div class="criterion-item">
+                        <div class="criterion-icon">🏛️</div>
+                        <div class="criterion-text">
+                            <h3>الأقواس المنحنية</h3>
+                            <p>التقاء الجدران بالأرضية</p>
+                        </div>
+                    </div>
+                    <div class="criterion-item">
+                        <div class="criterion-icon">🌀</div>
+                        <div class="criterion-text">
+                            <h3>شبك التهوية</h3>
+                            <p>الحماية من القوارض والحشرات</p>
+                        </div>
+                    </div>
+                    <div class="criterion-item">
+                        <div class="criterion-icon">🗑️</div>
+                        <div class="criterion-text">
+                            <h3>سلال النفايات</h3>
+                            <p>الإغلاق المحكم والآمن</p>
+                        </div>
+                    </div>
+                    <div class="criterion-item">
+                        <div class="criterion-icon">⬜</div>
+                        <div class="criterion-text">
+                            <h3>الأرضيات</h3>
+                            <p>خالية من التشققات والكسور</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        <input type="number" id="crNumber" placeholder="رقم السجل التجاري" style="width: 100%; padding: 14px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 10px; font-size: 16px;">
-        <div id="roomsContainer"></div>
-        <button class="btn btn-add" onclick="addRoomUI()">➕ إضافة غرفة / قسم</button>
-        <div style="flex: 1;"></div>
-        <button class="btn btn-primary" onclick="startFullInspection()">بدء الفحص</button>
-    </div>
+            <div class="form-card">
+                <div class="form-group">
+                    <label for="crNumber">رقم السجل التجاري</label>
+                    <input type="text" id="crNumber" placeholder="أدخل رقم السجل التجاري" required>
+                </div>
 
-    <div id="inspectionScreen" class="screen">
-        <div style="text-align: center; background: #F8FAFC; padding: 10px; border-radius: 10px;">
-            <h3 id="ui-room-name" style="color: var(--success);">المطبخ</h3>
-            <span id="ui-task-name" style="font-weight: bold;">فحص الزوايا</span>
-            <span id="ui-counter" style="color: #64748B;">(1 من 4)</span>
-        </div>
+                <div class="form-group">
+                    <label for="restaurantName">اسم المطعم/المنشأة</label>
+                    <input type="text" id="restaurantName" placeholder="أدخل اسم المنشأة" required>
+                </div>
 
-        <div class="camera-container">
-            <video id="video" autoplay playsinline muted></video>
-            <canvas id="overlay"></canvas>
-            
-            <div id="arcTools" class="arc-controls">
-                <button onclick="flipX *= -1" style="padding: 8px; background: #fff; border: 1px solid #ccc; border-radius: 8px;">🔄 عكس</button>
-                <input type="range" id="arcSize" min="50" max="150" value="100" style="flex: 1;">
-                <span style="font-size: 12px;">الحجم</span>
+                <div id="roomsContainer">
+                    <div class="room-group">
+                        <label>المنطقة/الغرفة الأولى</label>
+                        <input type="text" class="room-input" placeholder="مثال: المطبخ، صالة الطعام، المخزن..." required>
+                    </div>
+                </div>
+
+                <button id="addRoomBtn" class="btn-secondary">
+                    <span>➕</span> إضافة منطقة أخرى
+                </button>
+
+                <button id="startInspectionBtn" class="btn-primary">
+                    <span>🚀</span> بدء الفحص الذكي
+                </button>
+            </div>
+
+            <div class="footer-note">
+                <p>💡 النظام يستخدم الذكاء الاصطناعي لتحليل الصور تلقائياً وكشف المخالفات</p>
             </div>
         </div>
-
-        <button class="btn btn-primary" onclick="captureAndLogic()">📸 تحليل وتوثيق</button>
     </div>
 
-    <div id="reportScreen" class="screen">
-        <h2 style="color: var(--danger); text-align: center;">تقرير المخالفات</h2>
-        <div id="violationList" style="margin: 20px 0;"></div>
-        <button class="btn btn-primary" onclick="location.reload()">إغلاق</button>
-    </div>
-
-<script>
-    let roomsData = [], currentRoomIdx = 0, currentTaskType = 'walls', taskCounter = 1, violations = [];
-    let flipX = 1;
-    const canvas = document.getElementById('overlay'), ctx = canvas.getContext('2d');
-
-    function addRoomUI() {
-        const id = Date.now();
-        const html = `
-            <div class="room-entry" id="room_${id}">
-                <input type="text" placeholder="اسم الغرفة" class="r-name" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ddd; font-weight:bold;">
-                <div class="input-grid">
-                    <div><label>الجدران:</label><input type="number" class="r-walls" value="4"></div>
-                    <div><label>السلال:</label><input type="number" class="r-bins" value="2"></div>
-                    <div><label>التهوية:</label><input type="number" class="r-vents" value="1"></div>
-                    <div><label>الأرضية:</label><input type="number" class="r-floors" value="1"></div>
+    <!-- شاشة الفحص -->
+    <div id="inspectionScreen" class="screen">
+        <div class="inspection-container">
+            <div class="inspection-header">
+                <h2 id="currentRoomName">المطبخ</h2>
+                <div class="progress-bar">
+                    <div id="progressFill" class="progress-fill"></div>
                 </div>
-            </div>`;
-        document.getElementById('roomsContainer').insertAdjacentHTML('beforeend', html);
-    }
-    addRoomUI();
+                <p id="progressText" class="progress-text">التقدم: 0 من 4 معايير</p>
+            </div>
 
-    async function startFullInspection() {
-        if(!document.getElementById('crNumber').value) return alert("أدخل رقم السجل");
-        document.querySelectorAll('.room-entry').forEach(div => {
-            roomsData.push({
-                name: div.querySelector('.r-name').value || "غرفة",
-                walls: parseInt(div.querySelector('.r-walls').value) || 0,
-                bins: parseInt(div.querySelector('.r-bins').value) || 0,
-                vents: parseInt(div.querySelector('.r-vents').value) || 0,
-                floors: parseInt(div.querySelector('.r-floors').value) || 0
-            });
-        });
-        document.getElementById('setupScreen').classList.remove('active-screen');
-        document.getElementById('inspectionScreen').classList.add('active-screen');
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-        document.getElementById('video').srcObject = stream;
-        requestAnimationFrame(renderOverlays);
-    }
+            <div class="camera-container">
+                <video id="cameraFeed" autoplay playsinline></video>
+                <canvas id="analysisCanvas"></canvas>
+                
+                <div id="guidanceOverlay" class="guidance-overlay">
+                    <div class="guide-arc"></div>
+                    <p id="guidanceText" class="guidance-text">وجّه الكاميرا نحو التقاء الجدار بالأرضية</p>
+                </div>
 
-    function renderOverlays() {
-        canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight;
-        const cx = canvas.width/2, cy = canvas.height/2;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        // إظهار أدوات القوس فقط عند فحص الجدران
-        document.getElementById('arcTools').style.display = (currentTaskType === 'walls') ? 'flex' : 'none';
+                <div id="loadingOverlay" class="loading-overlay hidden">
+                    <div class="spinner"></div>
+                    <p>جارِ التحليل بالذكاء الاصطناعي...</p>
+                </div>
+            </div>
 
-        if (currentTaskType === 'walls') {
-            const size = parseInt(document.getElementById('arcSize').value);
-            ctx.save();
-            ctx.translate(cx, cy);
-            ctx.scale(flipX, 1);
+            <div class="current-criterion">
+                <h3 id="criterionTitle">المعيار الحالي: الأقواس المنحنية</h3>
+                <p id="criterionDesc">تأكد من أن التقاء الجدار بالأرضية منحني وليس بزاوية 90 درجة</p>
+            </div>
 
-            // 1. المنطقة المظللة (التي يجب أن يغطيها الانحناء)
-            ctx.fillStyle = "rgba(231, 76, 60, 0.2)";
-            ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(0, -size); ctx.arcTo(0, 0, size, 0, size); ctx.closePath(); ctx.fill();
+            <div class="inspection-controls">
+                <button id="captureBtn" class="btn-capture">
+                    <span>📸</span> تحليل الصورة
+                </button>
+                <button id="skipBtn" class="btn-skip">تخطي المعيار</button>
+            </div>
 
-            // 2. القوس الهندسي
-            ctx.strokeStyle = '#27AE60'; ctx.lineWidth = 5;
-            ctx.beginPath(); ctx.moveTo(0, -size); ctx.arcTo(0, 0, size, 0, size); ctx.stroke();
+            <div id="aiResults" class="ai-results hidden">
+                <div class="result-icon"></div>
+                <h3 class="result-title"></h3>
+                <p class="result-description"></p>
+                <button id="nextCriterionBtn" class="btn-next">المعيار التالي ←</button>
+            </div>
+        </div>
+    </div>
 
-            // 3. الخطوط الإرشادية
-            ctx.setLineDash([5, 5]); ctx.lineWidth = 1; ctx.strokeStyle = "#fff";
-            ctx.beginPath(); ctx.moveTo(0, -cy); ctx.lineTo(0, 0); ctx.lineTo(cx, 0); ctx.stroke();
-            ctx.restore();
-        } else if (currentTaskType === 'vents') {
-            ctx.strokeStyle = '#27AE60'; ctx.lineWidth = 4; ctx.strokeRect(cx-100, cy-60, 200, 120);
-        } else if (currentTaskType === 'bins') {
-            ctx.strokeStyle = '#27AE60'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(cx-120, cy+80); ctx.lineTo(cx+120, cy+80); ctx.stroke();
-        } else if (currentTaskType === 'floors') {
-            ctx.strokeStyle = 'rgba(39, 174, 96, 0.5)'; ctx.lineWidth = 1; ctx.setLineDash([5, 5]);
-            for(let i=-3; i<=3; i++) { ctx.beginPath(); ctx.moveTo(cx+(i*60), 0); ctx.lineTo(cx+(i*60), canvas.height); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, cy+(i*60)); ctx.lineTo(canvas.width, cy+(i*60)); ctx.stroke(); }
-        }
-        
-        updateInspectionUI();
-        requestAnimationFrame(renderOverlays);
-    }
+    <!-- شاشة النتائج -->
+    <div id="resultsScreen" class="screen">
+        <div class="container">
+            <div class="results-header">
+                <div class="success-animation">✓</div>
+                <h1>اكتمل الفحص!</h1>
+                <p id="inspectionDate"></p>
+            </div>
 
-    function updateInspectionUI() {
-        const room = roomsData[currentRoomIdx];
-        const labels = { walls: 'فحص الزوايا', bins: 'فحص السلال', vents: 'فحص التهوية', floors: 'فحص الأرضية' };
-        document.getElementById('ui-room-name').innerText = room.name;
-        document.getElementById('ui-task-name').innerText = labels[currentTaskType];
-        document.getElementById('ui-counter').innerText = `(${taskCounter} من ${room[currentTaskType]})`;
-    }
+            <div class="summary-card">
+                <div class="summary-stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalRooms">0</div>
+                        <div class="stat-label">منطقة مفحوصة</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalViolations">0</div>
+                        <div class="stat-label">مخالفة محتملة</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="complianceScore">0%</div>
+                        <div class="stat-label">درجة الالتزام</div>
+                    </div>
+                </div>
+            </div>
 
-    function captureAndLogic() {
-        const isPass = Math.random() > 0.4;
-        const room = roomsData[currentRoomIdx];
-        if (!isPass) violations.push({ room: room.name, item: document.getElementById('ui-task-name').innerText, count: taskCounter });
-        
-        if (taskCounter < room[currentTaskType]) { taskCounter++; } 
-        else {
-            const types = ['walls', 'bins', 'vents', 'floors'];
-            let idx = types.indexOf(currentTaskType);
-            if (idx < 3) { currentTaskType = types[idx+1]; taskCounter = 1; } 
-            else if (currentRoomIdx < roomsData.length - 1) { currentRoomIdx++; currentTaskType = 'walls'; taskCounter = 1; } 
-            else { showFinalReport(); }
-        }
-    }
+            <div id="violationsContainer"></div>
 
-    function showFinalReport() {
-        document.getElementById('inspectionScreen').classList.remove('active-screen');
-        document.getElementById('reportScreen').classList.add('active-screen');
-        document.getElementById('violationList').innerHTML = violations.map(v => `<div class="violation-card"><strong>📍 ${v.room}</strong><br>مخالفة في ${v.item} رقم ${v.count}<div style="width:100%; height:100px; background:#ddd; margin-top:10px; border-radius:10px; display:flex; align-items:center; justify-content:center; color:#666; font-size:12px;">[صورة المخالفة]</div></div>`).join('');
-    }
-</script>
+            <div class="action-buttons">
+                <button id="downloadReportBtn" class="btn-primary">
+                    <span>📥</span> تحميل التقرير
+                </button>
+                <button id="newInspectionBtn" class="btn-secondary">
+                    <span>🔄</span> فحص جديد
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3"></script>
+    <script src="app.js"></script>
 </body>
 </html>
