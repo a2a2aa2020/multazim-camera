@@ -3,103 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>نظام ملتزم - فحص الغرف</title>
+    <title>نظام ملتزم - النسخة الشاملة</title>
     <style>
-        :root { --primary: #0052CC; --success: #27AE60; --danger: #E74C3C; --bg: #FFFFFF; --text: #1E293B; --safe-top: env(safe-area-inset-top); }
+        :root { 
+            --primary: #0052CC; --success: #27AE60; --danger: #E74C3C; 
+            --bg: #FFFFFF; --safe-top: env(safe-area-inset-top); 
+        }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
-        body { background: var(--bg); color: var(--text); min-height: 100dvh; display: flex; flex-direction: column; }
+        body { background: white; color: #1E293B; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
         
-        .screen { display: none; flex-direction: column; width: 100%; padding: 20px; padding-top: calc(var(--safe-top) + 20px); }
+        .screen { display: none; flex-direction: column; height: 100%; width: 100%; padding: 20px; padding-top: calc(var(--safe-top) + 20px); background: white; overflow-y: auto; }
         .active-screen { display: flex; }
 
-        /* شاشة الإدخال */
-        .room-entry { background: #F8FAFC; padding: 15px; border-radius: 12px; border: 1px solid #E2E8F0; margin-bottom: 15px; }
+        /* شاشة الإعدادات */
+        .room-entry { background: #F8FAFC; padding: 15px; border-radius: 12px; border: 1px solid #E2E8F0; margin-bottom: 15px; position: relative; }
         .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .input-grid input { padding: 8px; border: 1px solid #CBD5E1; border-radius: 6px; width: 100%; }
+        .input-grid input { padding: 8px; border: 1px solid #CBD5E1; border-radius: 6px; width: 100%; font-size: 14px; }
         
-        /* الكاميرا */
-        .camera-container { position: relative; width: 100%; height: 350px; background: #000; border-radius: 15px; overflow: hidden; margin: 15px 0; }
+        /* واجهة الكاميرا */
+        #inspectionScreen { padding: 10px; overflow: hidden; }
+        .camera-container { position: relative; flex: 1; background: #000; border-radius: 20px; overflow: hidden; margin: 10px 0; display: flex; align-items: center; }
         #video { width: 100%; height: 100%; object-fit: cover; }
-        #overlay { position: absolute; inset: 0; pointer-events: none; }
+        #overlay { position: absolute; inset: 0; pointer-events: none; z-index: 10; width: 100%; height: 100%; }
 
         /* الأزرار */
-        .btn { padding: 14px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; font-size: 15px; }
-        .btn-add { background: #E2E8F0; color: var(--text); margin-bottom: 20px; }
-        .btn-primary { background: var(--primary); color: white; width: 100%; }
+        .btn { padding: 16px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; font-size: 16px; width: 100%; transition: 0.2s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-add { background: #F1F5F9; color: var(--text); margin-bottom: 10px; border: 1px dashed #CBD5E1; }
         
         /* التقرير */
-        .violation-card { border: 2px solid var(--danger); border-radius: 12px; padding: 15px; margin-bottom: 15px; background: #FFF5F5; }
-        .violation-img { width: 100%; height: 150px; background: #ddd; border-radius: 8px; margin-top: 10px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #666; }
+        .violation-card { border: 2px solid var(--danger); border-radius: 15px; padding: 15px; margin-bottom: 15px; background: #FFF5F5; }
+        .violation-header { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid #FEE2E2; padding-bottom: 5px; }
     </style>
 </head>
 <body>
 
     <div id="setupScreen" class="screen active-screen">
-        <h2 style="margin-bottom: 10px;">إعداد الفحص</h2>
-        <input type="number" id="crNumber" placeholder="رقم السجل التجاري" style="width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 8px;">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h2 style="font-size: 24px;">🛡️ إعداد جولة الفحص</h2>
+            <p style="color: #64748B;">أدخل بيانات المنشأة والمرافق</p>
+        </div>
+
+        <input type="number" id="crNumber" placeholder="رقم السجل التجاري" style="width: 100%; padding: 14px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 10px; font-size: 16px;">
         
         <div id="roomsContainer">
             </div>
-        
-        <button class="btn btn-add" onclick="addRoom()">➕ إضافة غرفة جديدة</button>
-        <button class="btn btn-primary" onclick="startInspection()">ابدأ فحص المنشأة</button>
+
+        <button class="btn btn-add" onclick="addRoomUI()">➕ إضافة غرفة / قسم جديد</button>
+        <div style="flex: 1;"></div>
+        <button class="btn btn-primary" onclick="startFullInspection()">بدء الفحص الميداني</button>
     </div>
 
     <div id="inspectionScreen" class="screen">
-        <h3 id="currentLocation">اسم الغرفة - فحص الجدران</h3>
-        <p id="taskProgress" style="font-size: 14px; color: var(--primary); margin-bottom: 10px;">العنصر 1 من 3</p>
-        
+        <div style="text-align: center; background: #F8FAFC; padding: 10px; border-radius: 10px;">
+            <h3 id="ui-room-name" style="color: var(--primary); font-size: 18px;">المطبخ</h3>
+            <div style="display: flex; justify-content: center; gap: 10px; margin-top: 5px; font-size: 14px;">
+                <span id="ui-task-name" style="font-weight: bold;">فحص الزوايا</span>
+                <span id="ui-counter" style="color: #64748B;">(1 من 4)</span>
+            </div>
+        </div>
+
         <div class="camera-container">
             <video id="video" autoplay playsinline muted></video>
             <canvas id="overlay"></canvas>
         </div>
 
-        <button class="btn btn-primary" onclick="processCheck()">📸 توثيق وتحليل</button>
+        <button class="btn btn-primary" onclick="captureAndLogic()">📸 تحليل وتوثيق العنصر</button>
     </div>
 
     <div id="reportScreen" class="screen">
-        <h2 style="color: var(--danger); text-align: center;">تقرير المخالفات المرصودة</h2>
-        <p id="reportCR" style="text-align: center; margin-bottom: 20px;"></p>
+        <h2 style="color: var(--danger); text-align: center; margin-bottom: 5px;">تقرير المخالفات</h2>
+        <p id="reportCRDisplay" style="text-align: center; color: #64748B; margin-bottom: 20px;"></p>
+        
         <div id="violationList"></div>
-        <button class="btn btn-primary" onclick="location.reload()">فحص جديد</button>
+        
+        <div style="flex: 1;"></div>
+        <button class="btn btn-primary" onclick="location.reload()">جولة فحص جديدة</button>
     </div>
 
 <script>
-    let roomsData = [];
-    let currentRoomIdx = 0;
-    let currentTaskType = 'walls'; // walls, bins, vents, floors
-    let taskCounter = 1;
-    let violations = [];
+    let roomsData = [], currentRoomIdx = 0, currentTaskType = 'walls', taskCounter = 1, violations = [];
+    const canvas = document.getElementById('overlay'), ctx = canvas.getContext('2d');
 
-    function addRoom() {
+    // إضافة غرفة في واجهة الإعدادات
+    function addRoomUI() {
         const id = Date.now();
         const html = `
             <div class="room-entry" id="room_${id}">
-                <input type="text" placeholder="اسم الغرفة (مثلاً: المطبخ الرئيسي)" class="r-name" style="font-weight:bold; margin-bottom:10px;">
+                <input type="text" placeholder="اسم الغرفة (مثلاً: المطبخ)" class="r-name" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd; font-weight:bold;">
                 <div class="input-grid">
                     <div><label>الجدران:</label><input type="number" class="r-walls" value="4"></div>
-                    <div><label>السلال:</label><input type="number" class="r-bins" value="1"></div>
+                    <div><label>السلال:</label><input type="number" class="r-bins" value="2"></div>
                     <div><label>التهوية:</label><input type="number" class="r-vents" value="1"></div>
-                    <div><label>الأرضيات:</label><input type="number" class="r-floors" value="1"></div>
+                    <div><label>الأرضية:</label><input type="number" class="r-floors" value="1"></div>
                 </div>
             </div>`;
         document.getElementById('roomsContainer').insertAdjacentHTML('beforeend', html);
     }
 
-    // إضافة غرفة واحدة تلقائياً عند البدء
-    addRoom();
+    // تشغيل الغرفة الأولى تلقائياً
+    addRoomUI();
 
-    async function startInspection() {
-        if(!document.getElementById('crNumber').value) return alert("أدخل رقم السجل");
-        
-        const roomDivs = document.querySelectorAll('.room-entry');
-        roomDivs.forEach(div => {
+    async function startFullInspection() {
+        const cr = document.getElementById('crNumber').value;
+        if(!cr) return alert("يرجى إدخال رقم السجل التجاري");
+
+        document.querySelectorAll('.room-entry').forEach(div => {
             roomsData.push({
                 name: div.querySelector('.r-name').value || "غرفة غير مسمى",
-                walls: parseInt(div.querySelector('.r-walls').value),
-                bins: parseInt(div.querySelector('.r-bins').value),
-                vents: parseInt(div.querySelector('.r-vents').value),
-                floors: parseInt(div.querySelector('.r-floors').value)
+                walls: parseInt(div.querySelector('.r-walls').value) || 0,
+                bins: parseInt(div.querySelector('.r-bins').value) || 0,
+                vents: parseInt(div.querySelector('.r-vents').value) || 0,
+                floors: parseInt(div.querySelector('.r-floors').value) || 0
             });
         });
 
@@ -108,72 +123,105 @@
         
         const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
         document.getElementById('video').srcObject = stream;
-        updateUI();
+        
+        requestAnimationFrame(renderOverlays);
     }
 
-    function updateUI() {
+    // وظيفة الرسم المستمر (الأدوات البصرية)
+    function renderOverlays() {
+        canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight;
+        const cx = canvas.width/2, cy = canvas.height/2;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = '#0052CC'; ctx.lineWidth = 4;
+
+        if (currentTaskType === 'walls') {
+            // رسم القوس الهندسي للزوايا
+            ctx.setLineDash([8, 5]); ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, cy); ctx.lineTo(canvas.width, cy); ctx.stroke();
+            ctx.setLineDash([]); ctx.lineWidth = 6;
+            ctx.beginPath(); ctx.moveTo(cx, cy-100); ctx.arcTo(cx, cy, cx+100, cy, 100); ctx.stroke();
+        } else if (currentTaskType === 'vents') {
+            // رسم مربع التهوية
+            ctx.strokeRect(cx-100, cy-60, 200, 120);
+        } else if (currentTaskType === 'bins') {
+            // رسم خط السلال
+            ctx.beginPath(); ctx.moveTo(cx-120, cy+80); ctx.lineTo(cx+120, cy+80); ctx.stroke();
+        } else if (currentTaskType === 'floors') {
+            // رسم شبكة الأرضية
+            ctx.setLineDash([5, 5]); ctx.lineWidth = 1;
+            for(let i=-3; i<=3; i++) {
+                ctx.beginPath(); ctx.moveTo(cx+(i*60), 0); ctx.lineTo(cx+(i*60), canvas.height); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(0, cy+(i*60)); ctx.lineTo(canvas.width, cy+(i*60)); ctx.stroke();
+            }
+        }
+        
+        updateInspectionUI();
+        requestAnimationFrame(renderOverlays);
+    }
+
+    function updateInspectionUI() {
         const room = roomsData[currentRoomIdx];
-        const taskNames = { walls: 'الجدران (الزوايا)', bins: 'سلال النفايات', vents: 'فتحات التهوية', floors: 'الأرضيات' };
-        document.getElementById('currentLocation').innerText = `${room.name} - ${taskNames[currentTaskType]}`;
-        document.getElementById('taskProgress').innerText = `العنصر ${taskCounter} من ${room[currentTaskType]}`;
+        const labels = { walls: 'فحص الزوايا', bins: 'فحص السلال', vents: 'فحص التهوية', floors: 'فحص الأرضية' };
+        document.getElementById('ui-room-name').innerText = room.name;
+        document.getElementById('ui-task-name').innerText = labels[currentTaskType];
+        document.getElementById('ui-counter').innerText = `(${taskCounter} من ${room[currentTaskType]})`;
     }
 
-    function processCheck() {
-        const isPass = Math.random() > 0.4; // محاكاة فحص AI
+    function captureAndLogic() {
+        const isPass = Math.random() > 0.4; // محاكاة لقرار الذكاء الاصطناعي
         const room = roomsData[currentRoomIdx];
 
         if (!isPass) {
             violations.push({
-                roomName: room.name,
-                type: currentTaskType,
-                desc: `مخالفة في ${currentTaskType} رقم ${taskCounter}`
+                room: room.name,
+                item: document.getElementById('ui-task-name').innerText,
+                count: taskCounter
             });
         }
 
-        // منطق التنقل بين العناصر والغرف
+        // تسلسل الفحص
         if (taskCounter < room[currentTaskType]) {
             taskCounter++;
         } else {
-            // الانتقال للنوع التالي في نفس الغرفة
             const types = ['walls', 'bins', 'vents', 'floors'];
-            let typeIdx = types.indexOf(currentTaskType);
+            let currentIdx = types.indexOf(currentTaskType);
             
-            if (typeIdx < types.length - 1) {
-                currentTaskType = types[typeIdx + 1];
+            if (currentIdx < 3) {
+                currentTaskType = types[currentIdx + 1];
                 taskCounter = 1;
+            } else if (currentRoomIdx < roomsData.length - 1) {
+                currentRoomIdx++;
+                currentTaskType = 'walls';
+                taskCounter = 1;
+                alert("انتقال إلى الغرفة التالية: " + roomsData[currentRoomIdx].name);
             } else {
-                // الانتقال للغرفة التالية
-                if (currentRoomIdx < roomsData.length - 1) {
-                    currentRoomIdx++;
-                    currentTaskType = 'walls';
-                    taskCounter = 1;
-                    alert("انتقال للغرفة التالية: " + roomsData[currentRoomIdx].name);
-                } else {
-                    return showFinalReport();
-                }
+                showFinalReport();
             }
         }
-        updateUI();
     }
 
     function showFinalReport() {
         document.getElementById('inspectionScreen').classList.remove('active-screen');
         document.getElementById('reportScreen').classList.add('active-screen');
-        document.getElementById('reportCR').innerText = "السجل التجاري: " + document.getElementById('crNumber').value;
+        document.getElementById('reportCRDisplay').innerText = "سجل تجاري رقم: " + document.getElementById('crNumber').value;
 
         const list = document.getElementById('violationList');
         if (violations.length === 0) {
-            list.innerHTML = "<p style='text-align:center; color:green;'>✅ لا توجد مخالفات، المنشأة ممتثلة بالكامل.</p>";
-            return;
+            list.innerHTML = "<div style='text-align:center; padding:40px;'>✅ جميع العناصر مطابقة للمواصفات</div>";
+        } else {
+            list.innerHTML = violations.map(v => `
+                <div class="violation-card">
+                    <div class="violation-header">
+                        <strong>📍 ${v.room}</strong>
+                        <span style="color:var(--danger); font-weight:bold;">⚠️ مخالف</span>
+                    </div>
+                    <div style="font-size:14px;">العنصر: ${v.item} (رقم ${v.count})</div>
+                    <div style="width:100%; height:120px; background:#ddd; border-radius:10px; margin-top:10px; display:flex; align-items:center; justify-content:center; color:#666; font-size:12px; border:1px solid #FEE2E2;">
+                        [صورة توثيق المخالفة]
+                    </div>
+                </div>
+            `).join('');
         }
-
-        list.innerHTML = violations.map(v => `
-            <div class="violation-card">
-                <strong>📍 ${v.roomName}</strong><br>
-                <span>نوع المخالفة: ${v.desc}</span>
-                <div class="violation-img">[صورة المخالفة الملتقطة من الكاميرا]</div>
-            </div>
-        `).join('');
     }
 </script>
 </body>
