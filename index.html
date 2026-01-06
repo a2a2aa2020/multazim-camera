@@ -5,31 +5,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>نظام ملتزم الذكي</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    
     <style>
+        /* ============================================
+           نظام التصميم الشامل (المعدل للأخضر والأبيض)
+           ============================================ */
         :root {
-            --primary: #10b981; /* أخضر زمردي */
-            --primary-dark: #059669;
-            --danger: #ef4444;
-            --bg-gradient: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            /* الألوان الأساسية */
+            --color-primary: #10b981; /* أخضر */
+            --color-secondary: #059669;
+            --color-error: #ef4444;
+            --color-warning: #f59e0b;
+            --color-text: #1f2937;
+            
+            /* الخلفية بيضاء ناصعة مع تدرج خفيف جداً */
+            --bg-gradient-main: linear-gradient(180deg, #FFFFFF 0%, #F3F4F6 100%);
+            
+            /* Glassmorphism للبطاقات */
             --glass-bg: rgba(255, 255, 255, 0.9);
-            --glass-border: rgba(255, 255, 255, 0.5);
-            --shadow: 0 10px 30px -10px rgba(16, 185, 129, 0.2);
+            --glass-border: rgba(0, 0, 0, 0.05);
+            --glass-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            
+            /* المسافات والأبعاد */
+            --spacing-md: 1rem;
+            --radius-lg: 16px;
+            --radius-full: 9999px;
+            
             --safe-top: env(safe-area-inset-top);
             --safe-bottom: env(safe-area-inset-bottom);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; -webkit-tap-highlight-color: transparent; }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
+        
         body {
-            background: var(--bg-gradient);
-            color: #1f2937;
-            height: 100dvh;
+            font-family: 'Cairo', sans-serif;
+            background: var(--bg-gradient-main);
+            color: var(--color-text);
+            height: 100vh; /* استخدام vh لضمان الامتلاء */
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
         }
 
-        /* --- الشاشات --- */
+        /* الشاشات */
         .screen {
             display: none;
             flex-direction: column;
@@ -39,68 +57,72 @@
             padding-top: calc(var(--safe-top) + 20px);
             padding-bottom: calc(var(--safe-bottom) + 20px);
             overflow-y: auto;
-            animation: fadeIn 0.4s ease;
+            position: absolute;
+            inset: 0;
         }
-        .active-screen { display: flex; }
+        .active-screen { display: flex; animation: fadeIn 0.4s ease-out; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* --- العناصر الجمالية --- */
+        /* العناصر المشتركة */
+        h1, h2, h3 { color: var(--color-text); font-weight: 700; margin-bottom: 10px; }
+        
         .brand-logo {
             font-size: 4rem;
+            color: var(--color-primary);
+            text-align: center;
             margin-bottom: 10px;
-            text-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
-            animation: float 3s ease-in-out infinite;
+            animation: pulse 2s infinite;
         }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
-        h2 { color: var(--primary-dark); font-weight: 800; margin-bottom: 5px; }
-        p { color: #6b7280; font-size: 0.9rem; }
-
-        /* --- البطاقات والحقول --- */
+        /* البطاقات والحقول */
         .glass-card {
             background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
             border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: var(--shadow);
+            border-radius: var(--radius-lg);
+            padding: 15px;
             margin-bottom: 15px;
+            box-shadow: var(--glass-shadow);
         }
 
         input {
             width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e5e7eb;
-            border-radius: 12px;
-            font-size: 1rem;
-            transition: 0.3s;
-            background: rgba(255,255,255,0.8);
+            padding: 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            font-family: 'Cairo', sans-serif;
+            margin-top: 5px;
+            background: #f9fafb;
         }
-        input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1); }
+        
+        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .input-label { font-size: 0.8rem; color: #6b7280; font-weight: 600; }
 
-        /* --- الأزرار --- */
+        /* الأزرار */
         .btn {
             width: 100%;
-            padding: 16px;
-            border-radius: 14px;
+            padding: 15px;
             border: none;
+            border-radius: 12px;
             font-weight: 700;
-            font-size: 1rem;
             cursor: pointer;
-            transition: all 0.2s;
+            font-family: 'Cairo', sans-serif;
+            transition: transform 0.2s;
             display: flex; align-items: center; justify-content: center; gap: 8px;
         }
+        .btn:active { transform: scale(0.98); }
+        
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
             color: white;
             box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
         }
-        .btn-primary:active { transform: scale(0.98); }
-        .btn-secondary { background: white; color: var(--primary-dark); border: 2px solid #e5e7eb; margin-bottom: 10px; }
+        
+        .btn-outline {
+            background: white;
+            border: 2px dashed #d1d5db;
+            color: #4b5563;
+        }
 
-        /* --- الكاميرا --- */
+        /* حاوية الكاميرا */
         .camera-wrapper {
             flex: 1;
             position: relative;
@@ -108,67 +130,83 @@
             border-radius: 24px;
             overflow: hidden;
             margin: 15px 0;
-            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.2);
-            border: 4px solid white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
+        
         #video { width: 100%; height: 100%; object-fit: cover; }
-        #overlay { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 10; }
+        #overlay { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
 
-        /* --- أدوات التحكم بالقوس --- */
-        .controls-overlay {
-            position: absolute; bottom: 15px; left: 15px; right: 15px;
+        /* أدوات التحكم العائمة للقوس */
+        .arc-controls {
+            position: absolute;
+            bottom: 20px; left: 20px; right: 20px;
             background: rgba(255,255,255,0.9);
-            padding: 12px; border-radius: 16px;
-            display: flex; align-items: center; gap: 10px;
+            padding: 10px 15px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
             z-index: 20;
-            backdrop-filter: blur(8px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            backdrop-filter: blur(5px);
         }
-        .range-slider { flex: 1; accent-color: var(--primary); height: 6px; }
+        
+        .slider-container { flex: 1; display: flex; align-items: center; gap: 10px; }
+        input[type=range] { margin: 0; height: 4px; }
 
-        /* --- التقرير --- */
+        /* التقرير */
         .violation-card {
-            background: #fef2f2; border: 1px solid #fee2e2;
-            border-radius: 16px; padding: 16px; margin-bottom: 12px;
-            border-right: 4px solid var(--danger);
+            border-right: 4px solid var(--color-error);
+            background: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            animation: slideUp 0.3s ease-out;
         }
-        .violation-img {
-            width: 100%; height: 120px; background: #eee;
-            border-radius: 10px; margin-top: 10px;
-            display: flex; align-items: center; justify-content: center;
-            color: #999; font-size: 0.8rem;
-        }
+
+        /* الرسوم المتحركة */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body>
 
     <div id="setupScreen" class="screen active-screen">
-        <div style="text-align: center; margin-bottom: 30px;">
+        <div style="text-align: center;">
             <div class="brand-logo">🛡️</div>
             <h2>نظام ملتزم</h2>
-            <p>منصة الفحص الذاتي للمنشآت</p>
+            <p style="color: #6b7280; margin-bottom: 20px;">التقييم الذكي للمنشآت الغذائية</p>
         </div>
 
         <div class="glass-card">
-            <label style="font-weight: bold; display: block; margin-bottom: 8px;">رقم السجل التجاري</label>
-            <input type="number" id="crNumber" placeholder="أدخل الرقم هنا...">
+            <div class="input-label">بيانات المنشأة</div>
+            <input type="number" id="crNumber" placeholder="رقم السجل التجاري">
         </div>
 
         <div id="roomsContainer">
             </div>
 
-        <button class="btn btn-secondary" onclick="addRoomUI()">+ إضافة قسم / غرفة</button>
+        <button class="btn btn-outline" onclick="addRoomUI()" style="margin-bottom: 10px;">
+            <span>➕</span> إضافة غرفة / قسم
+        </button>
+        
         <div style="flex: 1;"></div>
-        <button class="btn btn-primary" onclick="startFullInspection()">🚀 بدء الجولة الميدانية</button>
+        
+        <button class="btn btn-primary" onclick="startFullInspection()">
+            بدء جولة الفحص 🚀
+        </button>
     </div>
 
-    <div id="inspectionScreen" class="screen" style="padding: 10px;">
-        <div style="background: white; padding: 12px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+    <div id="inspectionScreen" class="screen" style="padding: 15px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
             <div>
-                <h3 id="ui-room-name" style="color: var(--primary-dark); font-size: 1.1rem; margin:0;">...</h3>
-                <span id="ui-task-name" style="font-size: 0.85rem; color: #6b7280;">...</span>
+                <h3 id="ui-room-name" style="color: var(--color-primary); margin: 0;">--</h3>
+                <small id="ui-task-name" style="color: #6b7280;">--</small>
             </div>
-            <div id="ui-counter" style="background: var(--bg-gradient); color: var(--primary-dark); padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.9rem;">
-                0/0
+            <div style="background: #ecfdf5; color: #047857; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.9rem;">
+                <span id="ui-counter">1/1</span>
             </div>
         </div>
 
@@ -176,65 +214,75 @@
             <video id="video" autoplay playsinline muted></video>
             <canvas id="overlay"></canvas>
             
-            <div id="arcControls" class="controls-overlay" style="display: none;">
-                <button onclick="flipX *= -1" style="border:1px solid #ddd; background:white; padding:8px 12px; border-radius:8px; font-size:1.2rem;">🔄</button>
-                <input type="range" id="arcSize" min="50" max="150" value="100" class="range-slider">
-                <span style="font-size:0.8rem; font-weight:bold;">حجم القوس</span>
+            <div id="arcTools" class="arc-controls" style="display: none;">
+                <button onclick="flipX *= -1" style="border:none; background:none; font-size:1.2rem; cursor:pointer;">🔄</button>
+                <div class="slider-container">
+                    <small>حجم</small>
+                    <input type="range" id="arcSize" min="50" max="180" value="100">
+                </div>
             </div>
         </div>
 
-        <button class="btn btn-primary" onclick="captureAndLogic()">📸 فحص وتوثيق</button>
+        <button class="btn btn-primary" style="height: 60px; font-size: 1.1rem;" onclick="captureAndLogic()">
+            📸 تحليل وتوثيق العنصر
+        </button>
     </div>
 
     <div id="reportScreen" class="screen">
         <div style="text-align: center; margin-bottom: 20px;">
             <div style="font-size: 3rem; margin-bottom: 10px;">📋</div>
-            <h2>تقرير الفحص النهائي</h2>
-            <p id="reportCRDisplay">سجل رقم: -</p>
+            <h2>تقرير المخالفات</h2>
+            <p id="reportMeta" style="color: #6b7280; font-size: 0.9rem;"></p>
         </div>
+
+        <div id="violationList" style="flex: 1;"></div>
         
-        <div id="violationList"></div>
-        
-        <button class="btn btn-primary" style="margin-top: auto;" onclick="location.reload()">بدء فحص جديد</button>
+        <button class="btn btn-primary" onclick="location.reload()" style="margin-top: 20px;">
+            إنهاء وبدء جولة جديدة
+        </button>
     </div>
 
 <script>
-    /* === المنطق البرمجي === */
-    let roomsData = [];
-    let currentRoomIdx = 0;
-    let currentTaskType = 'walls';
-    let taskCounter = 1;
+    /* =========================================
+       المنطق البرمجي (JavaScript Logic)
+       ========================================= */
+    let roomsData = [], currentRoomIdx = 0, currentTaskType = 'walls', taskCounter = 1;
     let violations = [];
-    let flipX = 1;
+    let flipX = 1; // متغير لعكس اتجاه القوس
+    
+    // تعريف الكانفاس
     const canvas = document.getElementById('overlay');
     const ctx = canvas.getContext('2d');
 
-    // 1. إضافة غرفة وافتراضية
+    // 1. إضافة غرفة جديدة للواجهة
     function addRoomUI() {
         const id = Date.now();
         const html = `
-            <div class="glass-card" id="room_${id}" style="padding: 15px;">
-                <input type="text" class="r-name" placeholder="اسم الغرفة (مثلاً: المستودع)" style="margin-bottom: 10px; font-weight:bold;">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                    <div><label style="font-size:0.8rem">جدران</label><input type="number" class="r-walls" value="4"></div>
-                    <div><label style="font-size:0.8rem">سلال</label><input type="number" class="r-bins" value="1"></div>
-                    <div><label style="font-size:0.8rem">تهوية</label><input type="number" class="r-vents" value="1"></div>
-                    <div><label style="font-size:0.8rem">أرضية</label><input type="number" class="r-floors" value="1"></div>
+            <div class="glass-card" id="room_${id}">
+                <div class="input-label" style="margin-bottom:5px;">اسم الغرفة</div>
+                <input type="text" class="r-name" placeholder="مثلاً: المطبخ الرئيسي" style="font-weight:bold; margin-bottom:10px;">
+                
+                <div class="input-grid">
+                    <div><div class="input-label">زوايا</div><input type="number" class="r-walls" value="4"></div>
+                    <div><div class="input-label">سلال</div><input type="number" class="r-bins" value="2"></div>
+                    <div><div class="input-label">تهوية</div><input type="number" class="r-vents" value="1"></div>
+                    <div><div class="input-label">أرضية</div><input type="number" class="r-floors" value="1"></div>
                 </div>
             </div>`;
         document.getElementById('roomsContainer').insertAdjacentHTML('beforeend', html);
     }
+    
     // إضافة غرفة افتراضية عند البدء
     addRoomUI();
 
-    // 2. تشغيل الكاميرا وبدء الفحص
+    // 2. بدء الفحص
     async function startFullInspection() {
         const cr = document.getElementById('crNumber').value;
         if(!cr) return alert("⚠️ يرجى إدخال رقم السجل التجاري");
 
         // جمع البيانات
         roomsData = [];
-        document.querySelectorAll('[id^="room_"]').forEach(div => {
+        document.querySelectorAll('.glass-card[id^="room_"]').forEach(div => {
             roomsData.push({
                 name: div.querySelector('.r-name').value || "غرفة عامة",
                 walls: parseInt(div.querySelector('.r-walls').value) || 0,
@@ -244,48 +292,52 @@
             });
         });
 
+        if(roomsData.length === 0) return alert("أضف غرفة واحدة على الأقل");
+
         // الانتقال للشاشة التالية
         document.getElementById('setupScreen').classList.remove('active-screen');
         document.getElementById('inspectionScreen').classList.add('active-screen');
-
-        // تشغيل الفيديو
+        
+        // تشغيل الكاميرا
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
             document.getElementById('video').srcObject = stream;
-            requestAnimationFrame(renderLoop);
-        } catch(e) {
-            alert("يرجى السماح بالوصول للكاميرا");
+            requestAnimationFrame(renderLoop); // بدء الرسم
+        } catch (e) {
+            alert("يرجى السماح بصلاحيات الكاميرا");
         }
     }
 
-    // 3. حلقة الرسم المستمرة (AR Overlay)
+    // 3. حلقة الرسم (Render Loop) - ترسم الأشكال 60 مرة في الثانية
     function renderLoop() {
         canvas.width = canvas.offsetWidth;
         canvas.height = canvas.offsetHeight;
         const cx = canvas.width / 2;
         const cy = canvas.height / 2;
-
+        
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
         // إظهار/إخفاء أدوات القوس
-        document.getElementById('arcControls').style.display = (currentTaskType === 'walls') ? 'flex' : 'none';
+        document.getElementById('arcTools').style.display = (currentTaskType === 'walls') ? 'flex' : 'none';
 
         if (currentTaskType === 'walls') {
-            // رسم القوس والمنطقة المظللة
+            // == رسم القوس والمنطقة المظللة ==
             const size = parseInt(document.getElementById('arcSize').value);
+            
             ctx.save();
             ctx.translate(cx, cy);
-            ctx.scale(flipX, 1);
+            ctx.scale(flipX, 1); // عكس الاتجاه بناء على الزر
 
-            // المنطقة المظللة (الخطر)
-            ctx.fillStyle = "rgba(239, 68, 68, 0.2)"; // أحمر شفاف
+            // أ. المنطقة المظللة (الحمراء) للمخالفات
+            ctx.fillStyle = "rgba(239, 68, 68, 0.25)"; 
             ctx.beginPath();
             ctx.moveTo(0, 0);
-            ctx.lineTo(0, -size); 
+            ctx.lineTo(0, -size);
             ctx.arcTo(0, 0, size, 0, size);
+            ctx.closePath();
             ctx.fill();
 
-            // خط القوس الأخضر
+            // ب. خط القوس الأخضر
             ctx.strokeStyle = '#10b981'; 
             ctx.lineWidth = 6;
             ctx.beginPath();
@@ -293,110 +345,127 @@
             ctx.arcTo(0, 0, size, 0, size);
             ctx.stroke();
 
-            // خطوط مساعدة
-            ctx.strokeStyle = 'rgba(255,255,255,0.8)';
-            ctx.lineWidth = 2;
+            // ج. خطوط إرشادية للجدار
+            ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+            ctx.lineWidth = 1;
             ctx.setLineDash([5, 5]);
             ctx.beginPath(); ctx.moveTo(0, -cy); ctx.lineTo(0, 0); ctx.lineTo(cx, 0); ctx.stroke();
             
             ctx.restore();
 
         } else if (currentTaskType === 'vents') {
-            // مربع التهوية
+            // == رسم مربع التهوية ==
             ctx.strokeStyle = '#10b981'; ctx.lineWidth = 4;
             ctx.strokeRect(cx - 100, cy - 80, 200, 160);
-            ctx.fillStyle = 'rgba(16, 185, 129, 0.1)';
-            ctx.fillRect(cx - 100, cy - 80, 200, 160);
-
+            
         } else if (currentTaskType === 'bins') {
-            // خط السلة
+            // == رسم خط السلال ==
             ctx.strokeStyle = '#10b981'; ctx.lineWidth = 4;
             ctx.beginPath(); ctx.moveTo(cx - 130, cy + 50); ctx.lineTo(cx + 130, cy + 50); ctx.stroke();
-            ctx.fillStyle = "white"; ctx.font = "bold 14px Cairo"; ctx.fillText("حاذِ غطاء السلة هنا", cx - 60, cy + 40);
-
+            
         } else if (currentTaskType === 'floors') {
-            // شبكة الأرضية
-            ctx.strokeStyle = 'rgba(16, 185, 129, 0.4)'; ctx.lineWidth = 1;
-            for(let i=-4; i<=4; i++) {
-                ctx.beginPath(); ctx.moveTo(cx + (i*50), 0); ctx.lineTo(cx + (i*50), canvas.height); ctx.stroke();
-                ctx.beginPath(); ctx.moveTo(0, cy + (i*50)); ctx.lineTo(canvas.width, cy + (i*50)); ctx.stroke();
+            // == رسم شبكة الأرضية ==
+            ctx.strokeStyle = 'rgba(16, 185, 129, 0.4)'; ctx.lineWidth = 2;
+            // خطوط عمودية
+            for(let i=-2; i<=2; i++) {
+                ctx.beginPath(); ctx.moveTo(cx + (i*80), 0); ctx.lineTo(cx + (i*80), canvas.height); ctx.stroke();
+            }
+            // خطوط أفقية
+            for(let i=-2; i<=2; i++) {
+                ctx.beginPath(); ctx.moveTo(0, cy + (i*80)); ctx.lineTo(canvas.width, cy + (i*80)); ctx.stroke();
             }
         }
 
-        updateLabels();
+        updateUI();
         requestAnimationFrame(renderLoop);
     }
 
-    function updateLabels() {
+    // تحديث النصوص في الواجهة
+    function updateUI() {
         const room = roomsData[currentRoomIdx];
-        const labels = { walls: 'فحص الزوايا', bins: 'فحص السلال', vents: 'فحص التهوية', floors: 'فحص الأرضية' };
+        const labels = { 'walls': '📐 فحص الزوايا', 'bins': '🗑️ فحص السلال', 'vents': '🌬️ فحص التهوية', 'floors': '🧱 فحص الأرضية' };
         
         document.getElementById('ui-room-name').innerText = room.name;
         document.getElementById('ui-task-name').innerText = labels[currentTaskType];
         document.getElementById('ui-counter').innerText = `${taskCounter} / ${room[currentTaskType]}`;
     }
 
-    // 4. التقاط وتحليل ومنطق الانتقال
+    // منطق الالتقاط والحكم (AI Simulation)
     function captureAndLogic() {
-        const isPass = Math.random() > 0.3; // محاكاة الذكاء الاصطناعي
+        // محاكاة نتيجة الفحص (30% مخالفة للتجربة)
+        const isPass = Math.random() > 0.3; 
         const room = roomsData[currentRoomIdx];
+        const labels = { 'walls': 'انحناء الزاوية', 'bins': 'غطاء السلة', 'vents': 'شبك التهوية', 'floors': 'سلامة الأرضية' };
 
         if (!isPass) {
+            // تسجيل المخالفة
             violations.push({
                 room: room.name,
-                item: document.getElementById('ui-task-name').innerText,
-                id: taskCounter
+                item: labels[currentTaskType],
+                count: taskCounter
             });
+            // ومضة حمراء للشاشة
+            document.body.style.backgroundColor = "#fee2e2";
+            setTimeout(() => document.body.style.backgroundColor = "", 200);
+        } else {
+            // ومضة خضراء
+            document.body.style.backgroundColor = "#d1fae5";
+            setTimeout(() => document.body.style.backgroundColor = "", 200);
         }
 
-        // منطق التنقل
+        // الانتقال للعنصر التالي
         if (taskCounter < room[currentTaskType]) {
             taskCounter++;
         } else {
+            // الانتقال للنوع التالي (جدران -> سلال -> تهوية...)
             const types = ['walls', 'bins', 'vents', 'floors'];
-            let idx = types.indexOf(currentTaskType);
+            let currentTypeIdx = types.indexOf(currentTaskType);
             
-            if (idx < 3) {
-                // الانتقال للنوع التالي في نفس الغرفة
-                currentTaskType = types[idx + 1];
+            if (currentTypeIdx < 3) {
+                currentTaskType = types[currentTypeIdx + 1];
                 taskCounter = 1;
-            } else if (currentRoomIdx < roomsData.length - 1) {
-                // الانتقال للغرفة التالية
-                currentRoomIdx++;
-                currentTaskType = 'walls';
-                taskCounter = 1;
-                alert(`✅ تم إنجاز ${room.name}. الانتقال إلى: ${roomsData[currentRoomIdx].name}`);
             } else {
-                // انتهاء الفحص
-                showReport();
+                // الانتقال للغرفة التالية
+                if (currentRoomIdx < roomsData.length - 1) {
+                    currentRoomIdx++;
+                    currentTaskType = 'walls';
+                    taskCounter = 1;
+                    alert(`✅ اكتملت ${room.name}. الانتقال إلى: ${roomsData[currentRoomIdx].name}`);
+                } else {
+                    showFinalReport();
+                }
             }
         }
     }
 
-    // 5. عرض التقرير
-    function showReport() {
+    // عرض التقرير
+    function showFinalReport() {
         document.getElementById('inspectionScreen').classList.remove('active-screen');
         document.getElementById('reportScreen').classList.add('active-screen');
-        document.getElementById('reportCRDisplay').innerText = `سجل تجاري رقم: ${document.getElementById('crNumber').value}`;
-
+        
+        document.getElementById('reportMeta').innerText = `السجل التجاري: ${document.getElementById('crNumber').value} | التاريخ: ${new Date().toLocaleDateString('ar-SA')}`;
+        
         const list = document.getElementById('violationList');
+        
         if (violations.length === 0) {
             list.innerHTML = `
-                <div style="text-align:center; padding:40px; background:#f0fdf4; border-radius:20px; border:1px solid #bbf7d0;">
-                    <div style="font-size:3rem;">🎉</div>
-                    <h3 style="color:#15803d;">ممتاز! المنشأة ممتثلة بالكامل</h3>
-                    <p>لم يتم رصد أي مخالفات أثناء الجولة.</p>
+                <div style="text-align:center; padding:50px; color:#059669;">
+                    <div style="font-size:4rem;">🎉</div>
+                    <h3>ممتاز!</h3>
+                    <p>المنشأة مطابقة للاشتراطات بالكامل.</p>
                 </div>`;
         } else {
             list.innerHTML = violations.map(v => `
                 <div class="violation-card">
                     <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
                         <strong>📍 ${v.room}</strong>
-                        <span style="color:var(--danger); font-weight:bold;">غير مطابق</span>
+                        <span style="color:#ef4444; font-weight:bold; font-size:0.8rem;">⚠️ مخالفة</span>
                     </div>
-                    <div style="font-size:0.9rem; color:#4b5563;">${v.item} - عنصر رقم #${v.id}</div>
-                    <div class="violation-img">
-                        📷 صورة المخالفة (محاكاة)
+                    <div style="color:#374151; font-size:0.95rem;">
+                        المشكلة: ${v.item} (عنصر رقم ${v.count})
+                    </div>
+                    <div style="background:#f3f4f6; height:120px; border-radius:8px; margin-top:10px; display:flex; align-items:center; justify-content:center; border:1px dashed #d1d5db; color:#9ca3af; font-size:0.8rem;">
+                        [تم التقاط صورة للمخالفة]
                     </div>
                 </div>
             `).join('');
